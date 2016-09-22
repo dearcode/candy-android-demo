@@ -54,14 +54,24 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <Button
-                android:id="@+id/email_sign_in_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/sign_in_button"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:padding="12dp"
                 android:text="@string/action_sign_in"
-                android:textStyle="bold" />
+                />
+
+            <TextView android:id="@+id/link_signup"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="@string/action_create_now"
+                android:gravity="center"
+                android:textSize="16dip"/>
 
         </LinearLayout>
     </ScrollView>

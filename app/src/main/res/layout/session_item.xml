@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/session_item_margin">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <net.dearcode.candy.view.ImageView
+            android:id="@+id/si_iv_avatar"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/session_avatar_margin"
+            android:layout_marginRight="@dimen/session_avatar_margin"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/si_tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="60dp"
+            android:layout_marginTop="@dimen/session_item_interval_margin"
+            android:layout_toRightOf="@id/si_iv_avatar"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="群名字长度会很好的，要换行吗？还是省略呢？？？"
+            android:textColor="#000"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/si_tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/session_item_interval_margin"
+            android:text="12月12日" />
+
+        <TextView
+            android:id="@+id/si_tv_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/si_tv_title"
+            android:layout_toRightOf="@id/si_iv_avatar"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="Android初级工程师或者校招的面试过程中，很容易被问到LinearLayout与RelativeLayout区别，这是一个基础问题，由此可以引出例如ViewGroup和View绘制流程等问题，可以看出应聘者的掌握程度。" />
+
+    </RelativeLayout>
+
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="@dimen/session_item_margin"
+        android:background="#ddd" />
+
+</LinearLayout>

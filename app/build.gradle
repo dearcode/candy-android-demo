@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "net.dearcode.ic_launcher"
+        applicationId "net.dearcode.candy"
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
@@ -29,5 +29,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.android.support:design:22.2.1'
+    compile 'com.android.support:recyclerview-v7:22.2.1'
     compile(name:'candy', ext:'aar')
 }

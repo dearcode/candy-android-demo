@@ -11,8 +11,8 @@ import android.util.Log;
  */
 public class ServiceResponse implements Parcelable {
     public boolean hasError;
-    public long id;
-    public String error;
+    private long id;
+    private String error;
 
     private static final String TAG = "CandyMessage";
 
