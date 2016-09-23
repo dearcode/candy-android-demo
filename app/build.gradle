@@ -30,5 +30,6 @@ dependencies {
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.android.support:design:22.2.1'
     compile 'com.android.support:recyclerview-v7:22.2.1'
+    compile 'com.bartoszlipinski:recyclerviewheader2:2.0.1'
     compile(name:'candy', ext:'aar')
 }

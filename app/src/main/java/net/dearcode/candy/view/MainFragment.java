@@ -7,14 +7,19 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
+
+import net.dearcode.candy.CandyActivity;
 import net.dearcode.candy.R;
 import net.dearcode.candy.model.Session;
+import net.dearcode.candy.model.User;
 
 import java.util.ArrayList;
 
@@ -71,16 +76,61 @@ public class MainFragment extends Fragment {
         Log.i("INFO", "onCreateView:" + currentPageNum);
 
         View rootView = null;
+        RecyclerView rv = null;
 
         switch (currentPageNum) {
-            case 0 :
-                rootView = inflater.inflate(R.layout.fragment_candy, container, false);
-                TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-                textView.setText("这里要显示联系人列表");
+            case 0:
+                rootView = inflater.inflate(R.layout.fragment_contacts, container, false);
+                rv = (RecyclerView) rootView.findViewById(R.id.fg_rv_contacts);
+                RecyclerViewHeader header = (RecyclerViewHeader) rootView.findViewById(R.id.fg_rv_contacts_header);
+                rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+                rv.setItemAnimator(new DefaultItemAnimator());
+                header.attachTo(rv);
+
+                final ArrayList<User> data1 = new ArrayList<User>();
+                for (int i = 0; i < 20; i++) {
+                    switch (i % 2) {
+                        case 0:
+                            data1.add(new User(i, resourceIdToPath(this.getActivity(), R.mipmap.test_xiao), "老用户名" + i + "艺术大师"));
+                            break;
+                        default:
+                            data1.add(new User(i, resourceIdToPath(this.getActivity(), R.mipmap.test_da), "新户名" + i + "交了手机费"));
+                            break;
+                    }
+                }
+                rv.setAdapter(new RecyclerView.Adapter() {
+                    @Override
+                    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                        final View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, null);
+                        return new MyHolder(item);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+                        MyHolder h = (MyHolder) holder;
+                        h.ivAvater.setImageURI(Uri.parse(data1.get(position).getAvatar()));
+                        h.tvName.setText(data1.get(position).getName());
+                    }
+
+                    @Override
+                    public int getItemCount() {
+                        return data1.size();
+                    }
+
+                    class MyHolder extends RecyclerView.ViewHolder {
+                        ImageView ivAvater;
+                        TextView tvName;
+                        public MyHolder(View root) {
+                            super(root);
+                            ivAvater = (ImageView) root.findViewById(R.id.ui_iv_avatar);
+                            tvName= (TextView) root.findViewById(R.id.ui_tv_name);
+                        }
+                    }
+                });
                 return rootView;
             case 1:
                 rootView = inflater.inflate(R.layout.fragment_session, container, false);
-                RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.fg_rv_session);
+                rv = (RecyclerView) rootView.findViewById(R.id.fg_rv_session);
                 rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
                 rv.setItemAnimator(new DefaultItemAnimator());
 
@@ -134,10 +184,28 @@ public class MainFragment extends Fragment {
                     }
                 });
                 return rootView;
+            case 2:
+                rootView = inflater.inflate(R.layout.fragment_candy, container, false);
+                TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+                textView.setText("这里要显示朋友圈");
+                return rootView;
         }
-        rootView = inflater.inflate(R.layout.fragment_candy, container, false);
-        TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-        textView.setText("这里要显示朋友圈");
+
+        rootView = inflater.inflate(R.layout.fragment_control, container, false);
+        TextView tvUserName = (TextView) rootView.findViewById(R.id.fc_tv_user_name);
+        TextView tvUserID = (TextView) rootView.findViewById(R.id.fc_tv_user_id);
+        ImageView ivUserAvatar = (ImageView) rootView.findViewById(R.id.fc_iv_user_avatar);
+
+        CandyActivity ca = (CandyActivity)getActivity();
+        User user = ca.getUser();
+        if (TextUtils.isEmpty(user.getName())) {
+            tvUserName.setText("未登录，点我登录吧");
+            return rootView;
+        }
+
+        tvUserName.setText(user.getName());
+        tvUserID.setText("ID:"+user.getId());
+        ivUserAvatar.setImageURI(Uri.parse(user.getAvatar()));
 
         return rootView;
 

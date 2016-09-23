@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,15 +14,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import net.dearcode.candy.model.MessageServiceConnection;
+import net.dearcode.candy.model.User;
 import net.dearcode.candy.view.MainFragment;
 
 public class CandyActivity extends AppCompatActivity {
     private static final String TAG = "CandyMessage";
     private long id;
+    private String avatar;
     private String user;
     private String pass;
     private TextView tvUserName;
@@ -38,15 +37,19 @@ public class CandyActivity extends AppCompatActivity {
     private static final int waitLogin = 1;
     private static final int waitRegister = 2;
 
+    public User getUser() {
+        return new User(id, avatar, user);
+    }
 
     private void dbInit() {
         db = openOrCreateDatabase("candy.db", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS user (id INTEGER, user TEXT, pass TEXT)");
-        Cursor c = db.rawQuery("SELECT id, user,pass FROM user limit 1", null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS user (id INTEGER, user TEXT, pass TEXT, avatar TEXT)");
+        Cursor c = db.rawQuery("SELECT id, user,pass,avatar FROM user limit 1", null);
         if (c.moveToNext()) {
             id = c.getLong(0);
             user = c.getString(1);
             pass = c.getString(2);
+            avatar = c.getString(3);
         }
         c.close();
     }
@@ -70,15 +73,6 @@ public class CandyActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         //如果没有保存的账号，就让他登录
         if (user == null || pass == null || user.isEmpty() || pass.isEmpty()) {
@@ -145,11 +139,8 @@ public class CandyActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        private final String[] items = {"联系人", "会话", "朋友圈", "设置"};
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -157,28 +148,17 @@ public class CandyActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             return MainFragment.create(position);
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            return items.length;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "联系人";
-                case 1:
-                    return "会话";
-                case 2:
-                    return "朋友圈";
-            }
-            return null;
+            return items[position];
         }
     }
 }
