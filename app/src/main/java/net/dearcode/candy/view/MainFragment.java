@@ -120,10 +120,11 @@ public class MainFragment extends Fragment {
                     class MyHolder extends RecyclerView.ViewHolder {
                         ImageView ivAvater;
                         TextView tvName;
+
                         public MyHolder(View root) {
                             super(root);
                             ivAvater = (ImageView) root.findViewById(R.id.ui_iv_avatar);
-                            tvName= (TextView) root.findViewById(R.id.ui_tv_name);
+                            tvName = (TextView) root.findViewById(R.id.ui_tv_name);
                         }
                     }
                 });
@@ -196,7 +197,7 @@ public class MainFragment extends Fragment {
         TextView tvUserID = (TextView) rootView.findViewById(R.id.fc_tv_user_id);
         ImageView ivUserAvatar = (ImageView) rootView.findViewById(R.id.fc_iv_user_avatar);
 
-        CandyActivity ca = (CandyActivity)getActivity();
+        CandyActivity ca = (CandyActivity) getActivity();
         User user = ca.getUser();
         if (TextUtils.isEmpty(user.getName())) {
             tvUserName.setText("未登录，点我登录吧");
@@ -204,8 +205,10 @@ public class MainFragment extends Fragment {
         }
 
         tvUserName.setText(user.getName());
-        tvUserID.setText("ID:"+user.getId());
-        ivUserAvatar.setImageURI(Uri.parse(user.getAvatar()));
+        tvUserID.setText("ID:" + user.getId());
+        if (!TextUtils.isEmpty(user.getAvatar())) {
+            ivUserAvatar.setImageURI(Uri.parse(user.getAvatar()));
+        }
 
         return rootView;
 

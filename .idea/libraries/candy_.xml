@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="candy-">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/candy/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/candy/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

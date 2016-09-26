@@ -33,3 +33,4 @@ dependencies {
     compile 'com.bartoszlipinski:recyclerviewheader2:2.0.1'
     compile(name:'candy', ext:'aar')
 }
+

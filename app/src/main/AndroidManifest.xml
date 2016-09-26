@@ -27,9 +27,6 @@
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register" />
         <activity
-            android:name=".SessionActivity"
-            android:label="@string/title_session" />
-        <activity
             android:name=".CandyActivity"
             android:label="@string/title_activity_candy"
             android:theme="@style/AppTheme.NoActionBar">

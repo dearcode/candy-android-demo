@@ -26,13 +26,23 @@ public class MessageService extends Service {
     private MessageClient msgClient;
 
     private class MessageClient  implements MessageHandler {
-        public void OnError(String error) {
+        @Override
+        public void OnUnHealth(String s) {
+
+            Log.e(TAG, "OnUnHealth");
+        }
+
+        @Override
+        public void OnError(String s) {
+            Log.e(TAG, "OnError");
 
         }
 
         public  void OnRecv(long id, long method, long group, long from, long to, String msg) {
+            Log.e(TAG, "OnRecv");
 
         }
+
     }
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {

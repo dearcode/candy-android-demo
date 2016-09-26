@@ -17,6 +17,5 @@
     <string name="action_sign_up">注册</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="action_create_now">没有账号？？点击注册</string>
-    <string name="title_activity_candy">CandyActivity</string>
-    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_candy">Candy</string>
 </resources>
