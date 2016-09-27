@@ -1,10 +1,8 @@
-package net.dearcode.candy.view;
+package net.dearcode.candy;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,13 +18,11 @@ import android.widget.TextView;
 
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
 
-import net.dearcode.candy.CandyActivity;
-import net.dearcode.candy.R;
 import net.dearcode.candy.controller.Contacts;
 import net.dearcode.candy.model.Session;
 import net.dearcode.candy.model.User;
+import net.dearcode.candy.view.ImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**

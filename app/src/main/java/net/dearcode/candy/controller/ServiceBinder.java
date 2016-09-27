@@ -1,4 +1,4 @@
-package net.dearcode.candy.model;
+package net.dearcode.candy.controller;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,11 +15,11 @@ import net.dearcode.candy.service.MessageService;
  *  * mail：root@codecn.org
  *  
  */
-public class MessageServiceConnection implements ServiceConnection {
+public class ServiceBinder implements ServiceConnection {
     private CandyMessage candy = null;
     private Context ctx;
 
-    public MessageServiceConnection(Context ctx) {
+    public ServiceBinder(Context ctx) {
         this.ctx = ctx;
         Intent i = new Intent(ctx, MessageService.class);
         if (!ctx.bindService(i, this, Context.BIND_AUTO_CREATE)) {

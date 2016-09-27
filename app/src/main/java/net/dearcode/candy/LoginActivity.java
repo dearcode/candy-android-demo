@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.dearcode.candy.model.MessageServiceConnection;
+import net.dearcode.candy.controller.ServiceBinder;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.util.Common;
 
@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "Candy";
     private AutoCompleteTextView tvUser;
     private EditText tvPass;
-    private MessageServiceConnection conn;
+    private ServiceBinder conn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "密码都帮你输入好了，点登录吧", Toast.LENGTH_SHORT).show();
         }
 
-        conn = new MessageServiceConnection(this);
+        conn = new ServiceBinder(this);
 
         Button btnLogin = (Button) findViewById(R.id.sign_in_button);
         tvSignup.setOnClickListener(new OnClickListener() {

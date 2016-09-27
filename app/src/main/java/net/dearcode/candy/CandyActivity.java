@@ -11,14 +11,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import net.dearcode.candy.model.MessageServiceConnection;
+import net.dearcode.candy.controller.ServiceBinder;
 import net.dearcode.candy.model.User;
-import net.dearcode.candy.view.MainFragment;
 
 public class CandyActivity extends AppCompatActivity {
     private static final String TAG = "CandyMessage";
@@ -31,7 +29,7 @@ public class CandyActivity extends AppCompatActivity {
     private TextView tvUserID;
     private SQLiteDatabase db;
 
-    private static MessageServiceConnection conn;
+    private static ServiceBinder conn;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -64,7 +62,7 @@ public class CandyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        conn = new MessageServiceConnection(CandyActivity.this);
+        conn = new ServiceBinder(CandyActivity.this);
         setContentView(R.layout.activity_candy);
 
         dbInit();
