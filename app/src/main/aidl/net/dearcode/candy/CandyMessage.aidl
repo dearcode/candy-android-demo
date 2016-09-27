@@ -13,6 +13,8 @@ interface CandyMessage {
 
     ServiceResponse loadFriendList();
 
+    ServiceResponse loadUserInfo(long ID);
+
     long[] searchUser(String user);
 
     /**

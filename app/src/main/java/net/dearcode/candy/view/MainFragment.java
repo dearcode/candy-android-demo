@@ -1,6 +1,10 @@
 package net.dearcode.candy.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +26,7 @@ import net.dearcode.candy.controller.Contacts;
 import net.dearcode.candy.model.Session;
 import net.dearcode.candy.model.User;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -78,7 +83,15 @@ public class MainFragment extends Fragment {
             @Override
             public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
                 MyHolder h = (MyHolder) holder;
-                h.ivAvater.setImageURI(Uri.parse(users.get(position).getAvatar()));
+                byte[] avatar = users.get(position).getAvatar();
+                Bitmap bitmap;
+                if (avatar != null) {
+                    bitmap = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
+                } else {
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.test_da);
+                }
+
+                h.ivAvater.setImageBitmap(bitmap);
                 h.tvName.setText(users.get(position).getName());
             }
 
@@ -214,10 +227,15 @@ public class MainFragment extends Fragment {
         }
 
         tvUserName.setText(user.getName());
-        tvUserID.setText("ID:" + user.getId());
-        if (!TextUtils.isEmpty(user.getAvatar())) {
-            ivUserAvatar.setImageURI(Uri.parse(user.getAvatar()));
+        tvUserID.setText("ID:" + user.getID());
+        byte[] avatar = user.getAvatar();
+        Bitmap bitmap;
+        if (avatar != null) {
+            bitmap = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
+        } else {
+            bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.test_da);
         }
+        ivUserAvatar.setImageBitmap(bitmap);
 
         return rootView;
 

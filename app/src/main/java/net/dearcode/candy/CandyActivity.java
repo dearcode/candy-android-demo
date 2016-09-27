@@ -23,7 +23,7 @@ import net.dearcode.candy.view.MainFragment;
 public class CandyActivity extends AppCompatActivity {
     private static final String TAG = "CandyMessage";
     private long id;
-    private String avatar;
+    private byte[] avatar;
     private String user;
     private String pass;
     private String nickname;
@@ -31,7 +31,7 @@ public class CandyActivity extends AppCompatActivity {
     private TextView tvUserID;
     private SQLiteDatabase db;
 
-    private static MessageServiceConnection conn ;
+    private static MessageServiceConnection conn;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -52,12 +52,12 @@ public class CandyActivity extends AppCompatActivity {
             user = c.getString(1);
             pass = c.getString(2);
 //            nickname = c.getString(3);
- //           avatar = c.getString(4);
+            //           avatar = c.getString(4);
         }
         c.close();
     }
 
-    public static  CandyMessage getCandy() {
+    public static CandyMessage getCandy() {
         return conn.getCandy();
     }
 
@@ -83,6 +83,16 @@ public class CandyActivity extends AppCompatActivity {
         if (user == null || pass == null || user.isEmpty() || pass.isEmpty()) {
             Intent i = new Intent(CandyActivity.this, LoginActivity.class);
             startActivityForResult(i, waitLogin);
+        } else {
+            Intent i = new Intent(CandyActivity.this, LoginActivity.class);
+            Bundle b = new Bundle();
+            b.putString("user", user);
+            b.putString("pass", pass);
+            b.putBoolean("Register", true);
+            i.putExtras(b);
+            startActivityForResult(i, waitLogin);
+
+
         }
     }
 

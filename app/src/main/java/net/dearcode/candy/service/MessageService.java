@@ -52,6 +52,21 @@ public class MessageService extends Service {
     }
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {
+        @Override
+        public ServiceResponse loadUserInfo(long id) throws RemoteException {
+            Log.e(TAG, "will loadInfo user:" + id);
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                String data = client.getUserInfoByID(id);
+                Log.e(TAG, "getUserInfo ok , info:" + data);
+                sr.setData(data);
+            } catch (Exception e) {
+                Log.e(TAG, "register error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+
+            return sr;
+        }
 
         public ServiceResponse register(String user, String pass) throws RemoteException {
             Log.e(TAG, "will register user:" + user + " pass:" + pass);
@@ -71,8 +86,9 @@ public class MessageService extends Service {
             ServiceResponse sr = new ServiceResponse();
             try {
                 sr.setData(client.loadFriendList());
+                Log.e(TAG, "loadFriendList ok recv:" + sr.getData());
             } catch (Exception e) {
-                Log.e(TAG, "register error:" + e.getMessage());
+                Log.e(TAG, "loadFriendList error:" + e.getMessage());
                 sr.setError(e.getMessage());
             }
             return sr;
