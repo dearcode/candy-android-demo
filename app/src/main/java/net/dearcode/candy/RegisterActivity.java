@@ -65,8 +65,8 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
                 try {
-                    ServiceResponse sr = conn.getConn().register(user, password);
-                    if (sr.hasError) {
+                    ServiceResponse sr = conn.getCandy().register(user, password);
+                    if (sr.hasError()) {
                         Snackbar.make(view, sr.getError(), Snackbar.LENGTH_LONG).show();
                         return;
                     }

@@ -11,6 +11,8 @@ interface CandyMessage {
 
     ServiceResponse login(String user, String pass);
 
+    ServiceResponse loadFriendList();
+
     long[] searchUser(String user);
 
     /**

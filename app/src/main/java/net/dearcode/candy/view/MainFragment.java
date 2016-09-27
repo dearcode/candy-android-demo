@@ -18,6 +18,7 @@ import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
 
 import net.dearcode.candy.CandyActivity;
 import net.dearcode.candy.R;
+import net.dearcode.candy.controller.Contacts;
 import net.dearcode.candy.model.Session;
 import net.dearcode.candy.model.User;
 
@@ -49,13 +50,6 @@ public class MainFragment extends Fragment {
 
     }
 
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onCreate(android.os.Bundle)
-     *
-     * Fragment创建的时候调用
-     *
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +64,69 @@ public class MainFragment extends Fragment {
         return ANDROID_RESOURCE + context.getPackageName() + FORWARD_SLASH + resourceId;
     }
 
+    private void initContactsData(View root) {
+        RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
+        rv.setAdapter(new RecyclerView.Adapter() {
+            ArrayList<User> users = Contacts.getContacts();
+
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                final View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, null);
+                return new MyHolder(item);
+            }
+
+            @Override
+            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+                MyHolder h = (MyHolder) holder;
+                h.ivAvater.setImageURI(Uri.parse(users.get(position).getAvatar()));
+                h.tvName.setText(users.get(position).getName());
+            }
+
+            @Override
+            public int getItemCount() {
+                return users.size();
+            }
+
+            class MyHolder extends RecyclerView.ViewHolder {
+                ImageView ivAvater;
+                TextView tvName;
+
+                public MyHolder(View root) {
+                    super(root);
+                    ivAvater = (ImageView) root.findViewById(R.id.ui_iv_avatar);
+                    tvName = (TextView) root.findViewById(R.id.ui_tv_name);
+                }
+            }
+        });
+
+    }
+
+    private void initContactsView(View root) {
+        RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
+        RecyclerViewHeader header = (RecyclerViewHeader) root.findViewById(R.id.fg_rv_contacts_header);
+        rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        rv.setItemAnimator(new DefaultItemAnimator());
+        header.attachTo(rv);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            if (currentPageNum == 0) {
+
+                initContactsData(rootViews[0]);
+            }
+            //相当于Fragment的onResume
+        } else {
+            //相当于Fragment的onPause
+        }
+    }
+
+    private View[] rootViews = new View[3];
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         Log.i("INFO", "onCreateView:" + currentPageNum);
 
         View rootView = null;
@@ -81,53 +135,8 @@ public class MainFragment extends Fragment {
         switch (currentPageNum) {
             case 0:
                 rootView = inflater.inflate(R.layout.fragment_contacts, container, false);
-                rv = (RecyclerView) rootView.findViewById(R.id.fg_rv_contacts);
-                RecyclerViewHeader header = (RecyclerViewHeader) rootView.findViewById(R.id.fg_rv_contacts_header);
-                rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-                rv.setItemAnimator(new DefaultItemAnimator());
-                header.attachTo(rv);
-
-                final ArrayList<User> data1 = new ArrayList<User>();
-                for (int i = 0; i < 20; i++) {
-                    switch (i % 2) {
-                        case 0:
-                            data1.add(new User(i, resourceIdToPath(this.getActivity(), R.mipmap.test_xiao), "老用户名" + i + "艺术大师"));
-                            break;
-                        default:
-                            data1.add(new User(i, resourceIdToPath(this.getActivity(), R.mipmap.test_da), "新户名" + i + "交了手机费"));
-                            break;
-                    }
-                }
-                rv.setAdapter(new RecyclerView.Adapter() {
-                    @Override
-                    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                        final View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, null);
-                        return new MyHolder(item);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-                        MyHolder h = (MyHolder) holder;
-                        h.ivAvater.setImageURI(Uri.parse(data1.get(position).getAvatar()));
-                        h.tvName.setText(data1.get(position).getName());
-                    }
-
-                    @Override
-                    public int getItemCount() {
-                        return data1.size();
-                    }
-
-                    class MyHolder extends RecyclerView.ViewHolder {
-                        ImageView ivAvater;
-                        TextView tvName;
-
-                        public MyHolder(View root) {
-                            super(root);
-                            ivAvater = (ImageView) root.findViewById(R.id.ui_iv_avatar);
-                            tvName = (TextView) root.findViewById(R.id.ui_tv_name);
-                        }
-                    }
-                });
+                initContactsView(rootView);
+                rootViews[0] = rootView;
                 return rootView;
             case 1:
                 rootView = inflater.inflate(R.layout.fragment_session, container, false);

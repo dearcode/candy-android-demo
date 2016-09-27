@@ -9,14 +9,20 @@ import android.os.RemoteException;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+
 import net.dearcode.candy.CandyMessage;
 import net.dearcode.candy.model.ServiceResponse;
+import net.dearcode.candy.model.User;
 
 import java.io.IOException;
 
 import go.candy.Candy;
 import go.candy.CandyClient;
+import go.candy.FriendList;
 import go.candy.MessageHandler;
+import go.candy.UserInfo;
+
 
 /**
  * Created by Administrator on 2016/9/12.
@@ -26,23 +32,23 @@ public class MessageService extends Service {
     private MessageClient msgClient;
 
     private class MessageClient  implements MessageHandler {
-        @Override
-        public void OnUnHealth(String s) {
-
-            Log.e(TAG, "OnUnHealth");
-        }
 
         @Override
-        public void OnError(String s) {
-            Log.e(TAG, "OnError");
+        public void onError(String s) {
+            Log.e(TAG, "onError");
 
         }
 
-        public  void OnRecv(long id, long method, long group, long from, long to, String msg) {
-            Log.e(TAG, "OnRecv");
+        @Override
+        public void onUnHealth(String s) {
+            Log.e(TAG, "onUnHealth");
 
         }
 
+        @Override
+        public  void onRecv(long id, long method, long group, long from, long to, String msg) {
+            Log.e(TAG, "onRecv");
+        }
     }
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {
@@ -51,7 +57,7 @@ public class MessageService extends Service {
             Log.e(TAG, "will register user:" + user + " pass:" + pass);
             ServiceResponse sr = new ServiceResponse();
             try {
-                long id = client.Register(user, pass);
+                long id = client.register(user, pass);
                 Log.e(TAG, "register ok , id:" + id);
                 sr.setId(id);
             } catch (Exception e) {
@@ -61,12 +67,22 @@ public class MessageService extends Service {
             return sr;
         }
 
+        public ServiceResponse loadFriendList() throws RemoteException {
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                sr.setData(client.loadFriendList());
+            } catch (Exception e) {
+                Log.e(TAG, "register error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
+        }
 
         @Override
         public ServiceResponse login(String user, String pass) throws RemoteException {
             ServiceResponse sr = new ServiceResponse();
             try {
-                long id = client.Login(user, pass);
+                long id = client.login(user, pass);
                 Log.e(TAG, "login ok , id:" + id);
                 sr.setId(id);
             } catch (Exception e) {
@@ -110,12 +126,12 @@ public class MessageService extends Service {
     public void onCreate() {
         msgClient = new MessageClient();
         try {
-            client = Candy.NewCandyClient("candy.dearcode.net:9000", msgClient);
-            client.Start();
+            client = Candy.newCandyClient("candy.dearcode.net:9000", msgClient);
+            client.start();
         }catch (Exception e) {
             Log.e(TAG, "start candy client error:"+e.getMessage());
             try {
-                client.Stop();
+                client.stop();
             }catch (Exception err) {
                 Log.e(TAG, "stop candy client error:"+err.getMessage());
             }

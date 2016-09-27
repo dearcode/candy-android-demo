@@ -2,6 +2,7 @@ package net.dearcode.candy.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -10,8 +11,8 @@ import android.util.Log;
  *  
  */
 public class ServiceResponse implements Parcelable {
-    public boolean hasError;
     private long id;
+    private String data;
     private String error;
 
     private static final String TAG = "CandyMessage";
@@ -29,24 +30,21 @@ public class ServiceResponse implements Parcelable {
 
     public ServiceResponse() {
     }
+
     protected ServiceResponse(Parcel in) {
-        this.error = in.readString();
         this.id = in.readLong();
-        if (this.error != null && !this.error.isEmpty()) {
-            this.hasError = true;
-        }
-        Log.e(TAG, "recover data id:"+this.id+" err:"+this.error+" ok:"+(this.error != null && !this.error.isEmpty()) );
+        this.data = in.readString();
+        this.error = in.readString();
     }
 
     public String getError() {
-        Log.e(TAG, "getError:"+error);
+        Log.e(TAG, "getError:" + error);
         return error;
     }
 
     public void setError(String error) {
-        this.hasError = true;
         this.error = error;
-        Log.e(TAG, "setErr:"+error);
+        Log.e(TAG, "setErr:" + error);
     }
 
     @Override
@@ -56,13 +54,26 @@ public class ServiceResponse implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.error);
         dest.writeLong(this.id);
+        dest.writeString(this.data);
+        dest.writeString(this.error);
         Log.e(TAG, "write data");
+    }
+
+    public boolean hasError() {
+        return !TextUtils.isEmpty(this.error);
     }
 
     public long getId() {
         return id;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public void setId(long id) {

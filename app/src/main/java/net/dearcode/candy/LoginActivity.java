@@ -61,8 +61,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    ServiceResponse sr = conn.getConn().login(Common.GetString(tvUser.getText()), Common.GetString(tvPass.getText()));
-                    if (sr.hasError) {
+                    ServiceResponse sr = conn.getCandy().login(Common.GetString(tvUser.getText()), Common.GetString(tvPass.getText()));
+                    if (sr.hasError()) {
                         Snackbar.make(view, sr.getError(), Snackbar.LENGTH_LONG).show();
                         return;
                     }
@@ -86,6 +86,7 @@ public class LoginActivity extends AppCompatActivity {
         conn.Disconnect();
         finish();
     }
+
     @Override
     public void onBackPressed() {
         Toast.makeText(this, "不登录不准走", Toast.LENGTH_SHORT).show();

@@ -26,11 +26,13 @@ public class CandyActivity extends AppCompatActivity {
     private String avatar;
     private String user;
     private String pass;
+    private String nickname;
     private TextView tvUserName;
     private TextView tvUserID;
     private SQLiteDatabase db;
 
-    private CandyMessage candy = null;
+    private static MessageServiceConnection conn ;
+
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
 
@@ -38,32 +40,35 @@ public class CandyActivity extends AppCompatActivity {
     private static final int waitRegister = 2;
 
     public User getUser() {
-        return new User(id, avatar, user);
+        return new User(id, avatar, user, nickname);
     }
 
     private void dbInit() {
         db = openOrCreateDatabase("candy.db", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS user (id INTEGER, user TEXT, pass TEXT, avatar TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS user (id INTEGER, user TEXT, pass TEXT, nickname TEXT, avatar TEXT)");
         Cursor c = db.rawQuery("SELECT id, user,pass,avatar FROM user limit 1", null);
         if (c.moveToNext()) {
             id = c.getLong(0);
             user = c.getString(1);
             pass = c.getString(2);
-            avatar = c.getString(3);
+//            nickname = c.getString(3);
+ //           avatar = c.getString(4);
         }
         c.close();
+    }
+
+    public static  CandyMessage getCandy() {
+        return conn.getCandy();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        conn = new MessageServiceConnection(CandyActivity.this);
         setContentView(R.layout.activity_candy);
 
         dbInit();
 
-        if ((candy = new MessageServiceConnection(CandyActivity.this).getConn()) == null) {
-            Log.e(TAG, "bind service error");
-        }
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 

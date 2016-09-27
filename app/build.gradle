@@ -31,6 +31,7 @@ dependencies {
     compile 'com.android.support:design:22.2.1'
     compile 'com.android.support:recyclerview-v7:22.2.1'
     compile 'com.bartoszlipinski:recyclerviewheader2:2.0.1'
+    compile 'com.alibaba:fastjson:1.2.17'
     compile(name:'candy', ext:'aar')
 }
 
