@@ -3,19 +3,27 @@ package net.dearcode.candy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.dearcode.candy.controller.ServiceBinder;
+import com.alibaba.fastjson.JSON;
+
 import net.dearcode.candy.model.ServiceResponse;
+import net.dearcode.candy.model.User;
+import net.dearcode.candy.model.UserList;
 import net.dearcode.candy.util.Common;
+import net.dearcode.candy.view.ImageView;
+
+import java.util.ArrayList;
 
 /**
  *  * Created by c-wind on 2016/9/21 15:47
@@ -24,72 +32,131 @@ import net.dearcode.candy.util.Common;
  */
 public class SearchActivity extends AppCompatActivity {
     private static final String TAG = "Candy";
-    private AutoCompleteTextView tvUser;
-    private EditText tvPass;
-    private ServiceBinder conn;
+    private SearchView svUser;
+    private ListView lvUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_search);
 
-        tvUser = (AutoCompleteTextView) findViewById(R.id.email);
-        tvPass = (EditText) findViewById(R.id.password);
-        TextView tvSignup = (TextView) findViewById(R.id.link_signup);
+        svUser = (SearchView) findViewById(R.id.as_sv_user);
+        lvUsers = (ListView) findViewById(R.id.as_lv_users);
+        svUser.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return search(query, false);
+            }
 
-        Intent i = getIntent();
-        Bundle b = i.getExtras();
-        if (b != null && b.getBoolean("Register")) {
-            tvUser.setText(b.getString("user"));
-            tvPass.setText(b.getString("pass"));
-            Toast.makeText(this, "密码都帮你输入好了，点登录吧", Toast.LENGTH_SHORT).show();
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return search(newText, true);
+            }
+        });
+    }
+
+    //TODO 查本地数据库
+    private ArrayList<User> searchLocal(String name) {
+        ArrayList<User> list = new ArrayList<>();
+        return list;
+    }
+
+    private ArrayList<User> searchRemote(String name) {
+        ArrayList<User> list = new ArrayList<>();
+        try {
+            ServiceResponse sr = CandyActivity.getCandy().searchUser(name);
+            if (sr.hasError()) {
+                Log.e(Common.LOG_TAG, "search error:" + sr.getError());
+                return list;
+            }
+            UserList users = JSON.parseObject(sr.getData(), UserList.class);
+            list = users.getUsers();
+        } catch (RemoteException e) {
+            Log.e(Common.LOG_TAG, "search error:" + e.getMessage());
+        }
+        return list;
+    }
+
+    private class MyAdp extends BaseAdapter {
+        private ArrayList<User> users = new ArrayList<>();
+
+        public MyAdp(ArrayList<User> users) {
+            this.users = users;
         }
 
-        conn = new ServiceBinder(this);
+        @Override
+        public int getCount() {
+            return users.size();
+        }
 
-        Button btnLogin = (Button) findViewById(R.id.sign_in_button);
-        tvSignup.setOnClickListener(new OnClickListener() {
+        @Override
+        public Object getItem(int position) {
+            return users.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            class Holder {
+                ImageView ivAvater;
+                TextView tvName;
+            }
+
+            Holder h;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, null);
+                h = new Holder();
+                h.ivAvater = (ImageView) convertView.findViewById(R.id.ui_iv_avatar);
+                h.tvName = (TextView) convertView.findViewById(R.id.ui_tv_name);
+                convertView.setTag(h);
+            } else {
+                h = (Holder) convertView.getTag();
+            }
+
+            h.ivAvater.setImageBitmap(users.get(position).getAvatarBitmap(getResources()));
+            h.tvName.setText(users.get(position).getName());
+            return convertView;
+        }
+    }
+
+    private boolean search(String name, boolean local) {
+        ArrayList<User> list;
+        if (local) {
+            list = searchLocal(name);
+        } else {
+            list = searchRemote(name);
+        }
+
+        final ArrayList<User> users = list;
+        if (users.size() == 0) {
+            if (!local) {
+                Toast.makeText(this, "未找到用户", Toast.LENGTH_LONG).show();
+            }
+            return false;
+        }
+
+        lvUsers.setAdapter(new MyAdp(users));
+        lvUsers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User u = users.get(position);
+                Intent i = new Intent(SearchActivity.this, UserInfoActivity.class);
                 Bundle b = new Bundle();
-                b.putBoolean("Redirect", true);
-                b.putString("RedirectTo", "Register");
-                backToMain(b);
+                b.putString("name", u.getName());
+                b.putString("nickname", u.getNickName());
+                b.putLong("id", u.getID());
+                b.putByteArray("nickname", u.getAvatar());
+                b.putString("From", "Search");
+                i.putExtras(b);
+                startActivityForResult(i, 0);
             }
         });
-        btnLogin.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    ServiceResponse sr = conn.getCandy().login(Common.GetString(tvUser.getText()), Common.GetString(tvPass.getText()));
-                    if (sr.hasError()) {
-                        Snackbar.make(view, sr.getError(), Snackbar.LENGTH_LONG).show();
-                        return;
-                    }
-
-                    Bundle b = new Bundle();
-                    b.putString("user", Common.GetString(tvUser.getText()));
-                    b.putString("pass", Common.GetString(tvPass.getText()));
-                    b.putLong("id", sr.getId());
-                    backToMain(b);
-                } catch (RemoteException e) {
-                    Snackbar.make(view, e.getMessage(), Snackbar.LENGTH_LONG).show();
-                }
-            }
-        });
+        return true;
     }
 
-    private void backToMain(Bundle b) {
-        Intent i = new Intent(this, CandyActivity.class);
-        i.putExtras(b);
-        this.setResult(RESULT_OK, i);
-        conn.Disconnect();
-        finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        Toast.makeText(this, "不登录不准走", Toast.LENGTH_SHORT).show();
-    }
 }
 

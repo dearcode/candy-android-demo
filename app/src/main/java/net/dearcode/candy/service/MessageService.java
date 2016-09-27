@@ -31,7 +31,7 @@ public class MessageService extends Service {
     private static final String TAG = "CandyMessage";
     private MessageClient msgClient;
 
-    private class MessageClient  implements MessageHandler {
+    private class MessageClient implements MessageHandler {
 
         @Override
         public void onError(String s) {
@@ -46,12 +46,27 @@ public class MessageService extends Service {
         }
 
         @Override
-        public  void onRecv(long id, long method, long group, long from, long to, String msg) {
+        public void onRecv(long id, long method, long group, long from, long to, String msg) {
             Log.e(TAG, "onRecv");
         }
     }
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {
+        @Override
+        public ServiceResponse addFriend(long ID, String msg) throws RemoteException {
+            Log.e(TAG, "will add friend user:" + ID);
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                boolean ok = client.addFriend(ID, false, msg);
+                Log.e(TAG, "add friend ok , confirm:" + ok);
+                sr.setData("" + ok);
+            } catch (Exception e) {
+                Log.e(TAG, "add friend error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
+        }
+
         @Override
         public ServiceResponse loadUserInfo(long id) throws RemoteException {
             Log.e(TAG, "will loadInfo user:" + id);
@@ -109,8 +124,16 @@ public class MessageService extends Service {
         }
 
         @Override
-        public long[] searchUser(String user) throws RemoteException {
-            return new long[0];
+        public ServiceResponse searchUser(String user) throws RemoteException {
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                sr.setData(client.findUser(user));
+                Log.e(TAG, "find user ok , recv:" + sr.getData());
+            } catch (Exception e) {
+                Log.e(TAG, "find user error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
         }
 
         @Override
@@ -144,12 +167,12 @@ public class MessageService extends Service {
         try {
             client = Candy.newCandyClient("candy.dearcode.net:9000", msgClient);
             client.start();
-        }catch (Exception e) {
-            Log.e(TAG, "start candy client error:"+e.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, "start candy client error:" + e.getMessage());
             try {
                 client.stop();
-            }catch (Exception err) {
-                Log.e(TAG, "stop candy client error:"+err.getMessage());
+            } catch (Exception err) {
+                Log.e(TAG, "stop candy client error:" + err.getMessage());
             }
         }
         Log.e(TAG, "onCreate connect canndy success");

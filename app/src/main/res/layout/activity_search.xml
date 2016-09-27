@@ -10,7 +10,16 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="net.dearcode.candy.SearchActivity">
 
+    <SearchView
+        android:id="@+id/as_sv_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="搜索用户账号" />
 
-
-
+    <ListView
+        android:id="@+id/as_lv_users"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 </LinearLayout>

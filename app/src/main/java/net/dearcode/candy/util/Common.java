@@ -6,6 +6,7 @@ package net.dearcode.candy.util;
  *  
  */
 public class Common {
+    public static String LOG_TAG = "Candy";
     public static String GetString(CharSequence cs) {
         if (cs == null)
             return "";

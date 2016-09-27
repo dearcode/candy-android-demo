@@ -1,6 +1,7 @@
 package net.dearcode.candy;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
@@ -113,6 +115,15 @@ public class MainFragment extends Fragment {
     private void initContactsView(View root) {
         RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
         RecyclerViewHeader header = (RecyclerViewHeader) root.findViewById(R.id.fg_rv_contacts_header);
+        RelativeLayout rlSearch = (RelativeLayout) header.findViewById(R.id.fc_rl_search);
+        rlSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), SearchActivity.class);
+                startActivityForResult(i, 0);
+            }
+        });
+
         rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         rv.setItemAnimator(new DefaultItemAnimator());
         header.attachTo(rv);
@@ -122,11 +133,10 @@ public class MainFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
+            //相当于Fragment的onResume
             if (currentPageNum == 0) {
-
                 initContactsData(rootViews[0]);
             }
-            //相当于Fragment的onResume
         } else {
             //相当于Fragment的onPause
         }

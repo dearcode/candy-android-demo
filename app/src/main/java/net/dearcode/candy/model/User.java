@@ -1,5 +1,11 @@
 package net.dearcode.candy.model;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import net.dearcode.candy.R;
+
 /**
  *  * Created by c-wind on 2016/9/21 18:34
  *  * mail：root@codecn.org
@@ -22,12 +28,23 @@ public class User {
         this.NickName = nickname;
     }
 
+
     public long getID() {
         return ID;
     }
 
     public byte[] getAvatar() {
         return Avatar;
+    }
+
+    public Bitmap getAvatarBitmap(Resources def) {
+        Bitmap bitmap;
+        if (Avatar != null) {
+            bitmap = BitmapFactory.decodeByteArray(Avatar, 0, Avatar.length);
+        } else {
+            bitmap = BitmapFactory.decodeResource(def, R.mipmap.test_da);
+        }
+        return bitmap;
     }
 
     public String getNickName() {

@@ -15,7 +15,9 @@ interface CandyMessage {
 
     ServiceResponse loadUserInfo(long ID);
 
-    long[] searchUser(String user);
+    ServiceResponse searchUser(String user);
+
+    ServiceResponse addFriend(long ID, String msg);
 
     /**
      * Demonstrates some basic types that you can use as parameters

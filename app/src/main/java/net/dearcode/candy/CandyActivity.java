@@ -19,7 +19,6 @@ import net.dearcode.candy.controller.ServiceBinder;
 import net.dearcode.candy.model.User;
 
 public class CandyActivity extends AppCompatActivity {
-    private static final String TAG = "CandyMessage";
     private long id;
     private byte[] avatar;
     private String user;
@@ -27,7 +26,7 @@ public class CandyActivity extends AppCompatActivity {
     private String nickname;
     private TextView tvUserName;
     private TextView tvUserID;
-    private SQLiteDatabase db;
+    private static SQLiteDatabase db;
 
     private static ServiceBinder conn;
 
@@ -43,7 +42,9 @@ public class CandyActivity extends AppCompatActivity {
 
     private void dbInit() {
         db = openOrCreateDatabase("candy.db", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS user (id INTEGER, user TEXT, pass TEXT, nickname TEXT, avatar TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, user TEXT, pass TEXT, nickname TEXT, avatar TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS friend(id INTEGER PRIMARY KEY)");
+
         Cursor c = db.rawQuery("SELECT id, user,pass,avatar FROM user limit 1", null);
         if (c.moveToNext()) {
             id = c.getLong(0);
@@ -54,6 +55,21 @@ public class CandyActivity extends AppCompatActivity {
         }
         c.close();
     }
+
+    public static boolean isFriend(long id) {
+        Cursor c = db.rawQuery("SELECT id FROM friend where id= " + id + " limit 1", null);
+        if (c.moveToNext()) {
+            c.close();
+            return true;
+        }
+        c.close();
+        return false;
+    }
+
+    public static void addFriend(long id) {
+        db.execSQL("insert into friend set id= " + id);
+    }
+
 
     public static CandyMessage getCandy() {
         return conn.getCandy();

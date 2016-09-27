@@ -49,7 +49,6 @@ public class RegisterActivity extends AppCompatActivity {
                 String password2 = Common.GetString(etPass2.getText());
 
                 if (TextUtils.isEmpty(user)) {
-
                     Snackbar.make(view, "用户名不能为空", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
