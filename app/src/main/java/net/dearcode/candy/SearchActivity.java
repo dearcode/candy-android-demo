@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,15 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        tb.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         svUser = (SearchView) findViewById(R.id.as_sv_user);
         lvUsers = (ListView) findViewById(R.id.as_lv_users);
@@ -64,7 +74,7 @@ public class SearchActivity extends AppCompatActivity {
     private ArrayList<User> searchRemote(String name) {
         ArrayList<User> list = new ArrayList<>();
         try {
-            ServiceResponse sr = CandyActivity.getCandy().searchUser(name);
+            ServiceResponse sr = Base.getService().searchUser(name);
             if (sr.hasError()) {
                 Log.e(Common.LOG_TAG, "search error:" + sr.getError());
                 return list;

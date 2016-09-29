@@ -15,6 +15,9 @@ public class UserList {
 
     public ArrayList<User> getUsers() {
         ArrayList<User> list = new ArrayList<>();
+        if (Users == null) {
+            return list;
+        }
         for (User u : Users) {
             list.add(u);
         }

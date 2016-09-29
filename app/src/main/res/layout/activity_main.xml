@@ -1,25 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/transparent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:gravity="center_horizontal|center_vertical"
+    android:orientation="vertical"
+    tools:context="net.dearcode.candy.MainActivity">
 
-    <include
-        layout="@layout/app_bar_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@mipmap/ic_launcher" />
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="@dimen/session_item_margin"
+        android:background="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/am_tv_state"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" />
+        android:layout_height="wrap_content"
+        android:text="正在加载中..." />
 
-</android.support.v4.widget.DrawerLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="@dimen/session_item_margin"
+        android:background="@android:color/transparent" />
+</LinearLayout>

@@ -3,6 +3,7 @@ package net.dearcode.candy.model;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 
 import net.dearcode.candy.R;
 
@@ -16,9 +17,14 @@ public class User {
     private byte[] Avatar;
     private String Name;
     private String NickName;
+    private String Password;
 
     public User() {
 
+    }
+    public User( String name, String password) {
+        this.Name = name;
+        this.Password = password;
     }
 
     public User(long ID, byte[] avatar, String name, String nickname) {
@@ -69,5 +75,20 @@ public class User {
 
     public void setNickName(String nickName) {
         NickName = nickName;
+    }
+
+    public void setBundle(Bundle bundle) {
+        bundle.putLong("id", ID);
+        bundle.putByteArray("avatar", Avatar);
+        bundle.putString("name", Name);
+        bundle.putString("nickname", NickName);
+    }
+
+    public String getPassword() {
+        return Password;
+    }
+
+    public void setPassword(String password) {
+        Password = password;
     }
 }

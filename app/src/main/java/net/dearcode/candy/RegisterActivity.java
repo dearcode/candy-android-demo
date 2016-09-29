@@ -5,13 +5,14 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import net.dearcode.candy.controller.ServiceBinder;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.util.Common;
 
@@ -24,26 +25,20 @@ public class RegisterActivity extends AppCompatActivity {
     private AutoCompleteTextView tvUser;
     private EditText etPass;
     private EditText etPass2;
-    private RegisterActivity self;
-    private ServiceBinder conn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        self = this;
         setContentView(R.layout.activity_register);
 
         tvUser = (AutoCompleteTextView) findViewById(R.id.email);
         etPass = (EditText) findViewById(R.id.password);
         etPass2 = (EditText) findViewById(R.id.password2);
 
-        conn = new ServiceBinder(this);
-
         Button tvUserSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         tvUserSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent ri = new Intent(RegisterActivity.this, CandyActivity.class);
                 String user = Common.GetString(tvUser.getText());
                 String password = Common.GetString(etPass.getText());
                 String password2 = Common.GetString(etPass2.getText());
@@ -63,18 +58,13 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
                 try {
-                    ServiceResponse sr = conn.getCandy().register(user, password);
+                    ServiceResponse sr = Base.getService().register(user, password);
                     if (sr.hasError()) {
                         Snackbar.make(view, sr.getError(), Snackbar.LENGTH_LONG).show();
                         return;
                     }
-
-                    Bundle b = new Bundle();
-                    b.putBoolean("Register", true);
-                    b.putLong("id", sr.getId());
-                    b.putString("user", user);
-                    b.putString("pass", password);
-                    backToMain(b);
+                    Base.db.saveUserPassword(sr.getId(), user, password);
+                    backToMainActivity();
                 } catch (Exception e) {
                     Snackbar.make(view, e.getMessage(), Snackbar.LENGTH_LONG).show();
                 }
@@ -83,21 +73,28 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void backToMain(Bundle b) {
-        Intent i = new Intent(this, CandyActivity.class);
-        i.putExtras(b);
-        this.setResult(RESULT_OK, i);
-        conn.Disconnect();
+    private void backToMainActivity() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
         finish();
     }
 
+    private long lastTime;
+
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Bundle b = new Bundle();
-        b.putBoolean("Redirect", true);
-        b.putString("RedirectTo", "Login");
-        backToMain(b);
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - lastTime) > 2000) {
+                lastTime = System.currentTimeMillis();
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_LONG).show();
+            } else {
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
+
+
 }
 

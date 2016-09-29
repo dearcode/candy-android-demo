@@ -55,6 +55,20 @@ public class MessageService extends Service {
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {
         @Override
+        public ServiceResponse connect() throws RemoteException {
+                Log.e(Common.LOG_TAG, "will connect server");
+                ServiceResponse sr = new ServiceResponse();
+                try {
+                    client.start();
+                    Log.e(Common.LOG_TAG, "connect ok");
+                } catch (Exception e) {
+                    Log.e(Common.LOG_TAG, "connect error:" + e.getMessage());
+                    sr.setError(e.getMessage());
+                }
+                return sr;
+        }
+
+        @Override
         public ServiceResponse addFriend(long ID, String msg) throws RemoteException {
             Log.e(Common.LOG_TAG, "will add friend user:" + ID);
             ServiceResponse sr = new ServiceResponse();
@@ -165,19 +179,14 @@ public class MessageService extends Service {
 
     @Override
     public void onCreate() {
+        Log.e(Common.LOG_TAG, "service onCreate begin");
         msgClient = new MessageClient();
         try {
             client = newCandyClient("candy.dearcode.net:9000", msgClient);
-            client.start();
         } catch (Exception e) {
-            Log.e(Common.LOG_TAG, "start candy client error:" + e.getMessage());
-            try {
-                client.stop();
-            } catch (Exception err) {
-                Log.e(Common.LOG_TAG, "stop candy client error:" + err.getMessage());
-            }
+            Log.e(Common.LOG_TAG, "service start candy client error:" + e.getMessage());
         }
-        Log.e(Common.LOG_TAG, "onCreate connect canndy success");
+        Log.e(Common.LOG_TAG, "service onCreate candy ok");
     }
 
     @Override

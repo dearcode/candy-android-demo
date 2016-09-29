@@ -35,6 +35,7 @@ import java.util.ArrayList;
 public class MainFragment extends Fragment {
 
     public static final String ARG_PAGE = "page_num";
+    private User user;
 
     // 当前页
     private int currentPageNum;
@@ -165,6 +166,7 @@ public class MainFragment extends Fragment {
 
 
                 final ArrayList<Session> data = new ArrayList<Session>();
+                /*
                 for (int i = 0; i < 100; i++) {
                     switch (i % 2) {
                         case 0:
@@ -175,6 +177,7 @@ public class MainFragment extends Fragment {
                             break;
                     }
                 }
+                */
                 rv.setAdapter(new RecyclerView.Adapter() {
                     @Override
                     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -225,8 +228,8 @@ public class MainFragment extends Fragment {
         TextView tvUserID = (TextView) rootView.findViewById(R.id.fc_tv_user_id);
         ImageView ivUserAvatar = (ImageView) rootView.findViewById(R.id.fc_iv_user_avatar);
 
-        CandyActivity ca = (CandyActivity) getActivity();
-        User user = ca.getUser();
+        user = Base.db.loadUserInfo();
+
         if (TextUtils.isEmpty(user.getName())) {
             tvUserName.setText("未登录，点我登录吧");
             return rootView;

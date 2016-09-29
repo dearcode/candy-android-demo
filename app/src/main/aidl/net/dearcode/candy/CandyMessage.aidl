@@ -7,6 +7,8 @@ import net.dearcode.candy.model.ServiceResponse;
 
 interface CandyMessage {
 
+    ServiceResponse connect();
+
     ServiceResponse register(String user, String pass);
 
     ServiceResponse login(String user, String pass);

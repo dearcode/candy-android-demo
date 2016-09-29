@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 
+import net.dearcode.candy.Base;
 import net.dearcode.candy.CandyActivity;
 import net.dearcode.candy.model.FriendList;
 import net.dearcode.candy.model.ServiceResponse;
@@ -21,14 +22,14 @@ public class Contacts {
     public static ArrayList<User> getContacts() {
         ArrayList<User> users = new ArrayList<>();
         try {
-            ServiceResponse sr = CandyActivity.getCandy().loadFriendList();
+            ServiceResponse sr = Base.getService().loadFriendList();
             if (sr.hasError()) {
                 Log.e(TAG, "loadFriendList error:"+sr.getError());
                 return users;
             }
             FriendList friendList = JSON.parseObject(sr.getData(), FriendList.class);
             for (long id: friendList.Users) {
-                sr = CandyActivity.getCandy().loadUserInfo(id);
+                sr = Base.getService().loadUserInfo(id);
                 if (sr.hasError()) {
                     Log.e(TAG, "loadUserInfo error:"+sr.getError());
                     return users;

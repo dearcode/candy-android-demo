@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.dearcode.candy.controller.ServiceBinder;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.util.Common;
 
@@ -23,10 +22,8 @@ import net.dearcode.candy.util.Common;
  *  
  */
 public class LoginActivity extends AppCompatActivity {
-    private static final String TAG = "Candy";
     private AutoCompleteTextView tvUser;
     private EditText tvPass;
-    private ServiceBinder conn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +42,6 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "密码都帮你输入好了，点登录吧", Toast.LENGTH_SHORT).show();
         }
 
-        conn = new ServiceBinder(this);
-
         Button btnLogin = (Button) findViewById(R.id.sign_in_button);
         tvSignup.setOnClickListener(new OnClickListener() {
             @Override
@@ -54,14 +49,15 @@ public class LoginActivity extends AppCompatActivity {
                 Bundle b = new Bundle();
                 b.putBoolean("Redirect", true);
                 b.putString("RedirectTo", "Register");
-                backToMain(b);
+                b.putInt("from", CandyActivity.FromLogin);
+                backToCandyActivity(b);
             }
         });
         btnLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    ServiceResponse sr = conn.getCandy().login(Common.GetString(tvUser.getText()), Common.GetString(tvPass.getText()));
+                    ServiceResponse sr = Base.getService().login(Common.GetString(tvUser.getText()), Common.GetString(tvPass.getText()));
                     if (sr.hasError()) {
                         Snackbar.make(view, sr.getError(), Snackbar.LENGTH_LONG).show();
                         return;
@@ -71,7 +67,8 @@ public class LoginActivity extends AppCompatActivity {
                     b.putString("user", Common.GetString(tvUser.getText()));
                     b.putString("pass", Common.GetString(tvPass.getText()));
                     b.putLong("id", sr.getId());
-                    backToMain(b);
+                    b.putInt("from", CandyActivity.FromLogin);
+                    backToCandyActivity(b);
                 } catch (RemoteException e) {
                     Snackbar.make(view, e.getMessage(), Snackbar.LENGTH_LONG).show();
                 }
@@ -79,17 +76,11 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void backToMain(Bundle b) {
+    private void backToCandyActivity(Bundle b) {
         Intent i = new Intent(this, CandyActivity.class);
         i.putExtras(b);
-        this.setResult(RESULT_OK, i);
-        conn.Disconnect();
+        startActivity(i);
         finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        Toast.makeText(this, "不登录不准走", Toast.LENGTH_SHORT).show();
     }
 }
 
