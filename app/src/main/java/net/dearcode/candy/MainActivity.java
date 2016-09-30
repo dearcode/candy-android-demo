@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
                     try {
                         ServiceResponse sr = candy.connect();
                         if (sr.hasError()) {
-                            message.obj = sr.getError();
+                            message.obj = "网络异常";
                             Log.e(Common.LOG_TAG, "connect server error:" + sr.getError());
                             state = StateOver;
                             message.what = 3;

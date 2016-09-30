@@ -198,7 +198,8 @@ public class MessageService extends Service {
         Log.e(Common.LOG_TAG, "service onCreate begin");
         msgClient = new MessageClient();
         try {
-            client = newCandyClient("candy.dearcode.net:9000", msgClient);
+            //client = newCandyClient("candy.dearcode.net:9000", msgClient);
+            client = newCandyClient("192.168.0.103:9000", msgClient);
         } catch (Exception e) {
             Log.e(Common.LOG_TAG, "service start candy client error:" + e.getMessage());
         }
