@@ -15,6 +15,7 @@ import android.widget.Toast;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.model.User;
 import net.dearcode.candy.util.Common;
+import net.dearcode.candy.util.Errors;
 
 public class MainActivity extends Activity {
 
@@ -123,7 +124,7 @@ public class MainActivity extends Activity {
                     try {
                         ServiceResponse sr = Base.getService().login(u.getName(), u.getPassword());
                         if (sr.hasError()) {
-                            message.obj = sr.getError();
+                            message.obj = Errors.ParseError(getApplicationContext(),sr.getError());
                             message.what = 2;
                             state = StateOver;
                             break;

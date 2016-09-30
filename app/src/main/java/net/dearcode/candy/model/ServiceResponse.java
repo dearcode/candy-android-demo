@@ -39,6 +39,7 @@ public class ServiceResponse implements Parcelable {
 
     public String getError() {
         Log.e(TAG, "getError:" + error);
+
         return error;
     }
 

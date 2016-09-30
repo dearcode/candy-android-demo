@@ -24,6 +24,10 @@ public class MessageService extends Service {
     private MessageClient msgClient;
 
     private class MessageClient implements MessageHandler {
+        @Override
+        public void onHealth() {
+            Log.e(Common.LOG_TAG, "onHealth");
+        }
 
         @Override
         public void onError(String s) {

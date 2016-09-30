@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.util.Common;
+import net.dearcode.candy.util.Errors;
 
 /**
  *  * Created by c-wind on 2016/9/21 15:47
@@ -59,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     ServiceResponse sr = Base.getService().login(Common.GetString(tvUser.getText()), Common.GetString(tvPass.getText()));
                     if (sr.hasError()) {
-                        Snackbar.make(view, sr.getError(), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(view, Errors.ParseError(getApplicationContext(),sr.getError()), Snackbar.LENGTH_LONG).show();
                         return;
                     }
 

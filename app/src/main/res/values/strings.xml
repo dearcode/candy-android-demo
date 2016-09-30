@@ -20,4 +20,14 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="action_create_now">没有账号？？点击注册</string>
     <string name="title_activity_candy">Candy</string>
+    
+    <!-- Strings related to errors -->
+    <string name="err_ok">成功</string>
+    <string name="err_failure">未知错误</string>
+    <string name="err_username_format">用户名格式错误</string>
+    <string name="err_username_len">用户名长度不符合要求，限制:6-32位邮箱地址</string>
+    <string name="err_userpasswd_format">用户密码格式错误</string>
+    <string name="err_userpasswd_len">用户密码长度错误</string>
+    <string name="err_usernick_format">用户昵称格式错误</string>
+    <string name="err_usernick_len">用户昵称长度错误</string>
 </resources>
