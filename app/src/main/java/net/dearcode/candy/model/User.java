@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import net.dearcode.candy.R;
 
@@ -54,10 +55,14 @@ public class User {
     }
 
     public String getNickName() {
+        if (NickName == null || TextUtils.isEmpty(NickName))
+            return getName();
         return NickName;
     }
 
     public String getName() {
+        if (Name == null|| TextUtils.isEmpty(Name))
+            return "Undefine";
         return Name;
     }
 

@@ -1,5 +1,6 @@
 package net.dearcode.candy;
 
+import android.accounts.Account;
 import android.app.Application;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -20,14 +21,22 @@ import net.dearcode.candy.util.Common;
  */
 public class Base extends Application {
     public static DB db;
+    public static User account;
     private static ServiceBinder binder;
+
+    public static void updateAccount(long id, String name, String password) {
+        db.saveAccount(id, name, password);
+        account = db.loadAccount();
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         db = new DB(this);
         binder = new ServiceBinder(this);
+        account = db.loadAccount();
         Log.e(Common.LOG_TAG, "onCreate bind");
+
     }
 
     @Override

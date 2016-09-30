@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -21,8 +20,10 @@ import android.widget.TextView;
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
 
 import net.dearcode.candy.controller.Contacts;
+import net.dearcode.candy.controller.SessionInfo;
 import net.dearcode.candy.model.Session;
 import net.dearcode.candy.model.User;
+import net.dearcode.candy.util.Common;
 import net.dearcode.candy.view.ImageView;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 public class MainFragment extends Fragment {
 
     public static final String ARG_PAGE = "page_num";
-    private User user;
+    private User account;
 
     // 当前页
     private int currentPageNum;
@@ -68,7 +69,18 @@ public class MainFragment extends Fragment {
         return ANDROID_RESOURCE + context.getPackageName() + FORWARD_SLASH + resourceId;
     }
 
-    private void initContactsData(View root) {
+    private void startChatActivity(boolean isGroup, long id) {
+        Intent i = new Intent(getActivity(), ChatActivity.class);
+        Bundle b = new Bundle();
+        b.putBoolean("isGroup", isGroup);
+        b.putLong("id", id);
+        i.putExtras(b);
+        startActivity(i);
+        getActivity().finish();
+
+    }
+
+    private void initContactsData(final View root) {
         RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
         rv.setAdapter(new RecyclerView.Adapter() {
             ArrayList<User> users = Contacts.getContacts();
@@ -76,22 +88,22 @@ public class MainFragment extends Fragment {
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 final View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, null);
+                item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = (int) v.getTag();
+                        startChatActivity(false, users.get(position).getID());
+                    }
+                });
                 return new MyHolder(item);
             }
 
             @Override
-            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
                 MyHolder h = (MyHolder) holder;
-                byte[] avatar = users.get(position).getAvatar();
-                Bitmap bitmap;
-                if (avatar != null) {
-                    bitmap = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
-                } else {
-                    bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.test_da);
-                }
-
-                h.ivAvater.setImageBitmap(bitmap);
+                h.ivAvatar.setImageBitmap(users.get(position).getAvatarBitmap(getResources()));
                 h.tvName.setText(users.get(position).getName());
+                h.item.setTag(position);
             }
 
             @Override
@@ -100,18 +112,22 @@ public class MainFragment extends Fragment {
             }
 
             class MyHolder extends RecyclerView.ViewHolder {
-                ImageView ivAvater;
+                View item;
+                ImageView ivAvatar;
                 TextView tvName;
 
-                public MyHolder(View root) {
-                    super(root);
-                    ivAvater = (ImageView) root.findViewById(R.id.ui_iv_avatar);
-                    tvName = (TextView) root.findViewById(R.id.ui_tv_name);
+                public MyHolder(View item) {
+                    super(item);
+                    this.item = item;
+                    ivAvatar = (ImageView) item.findViewById(R.id.ui_iv_avatar);
+                    tvName = (TextView) item.findViewById(R.id.ui_tv_name);
                 }
             }
         });
 
     }
+
+    private View[] rootViews = new View[3];
 
     private void initContactsView(View root) {
         RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
@@ -130,92 +146,96 @@ public class MainFragment extends Fragment {
         header.attachTo(rv);
     }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            //相当于Fragment的onResume
-            if (currentPageNum == 0) {
-                initContactsData(rootViews[0]);
-            }
-        } else {
-            //相当于Fragment的onPause
-        }
+    private void initSessionView(View root) {
+        RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_session);
+        rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        rv.setItemAnimator(new DefaultItemAnimator());
     }
 
-    private View[] rootViews = new View[3];
+
+    ArrayList<Session> data;
+
+    private void initSessionData(final View root) {
+        RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_session);
+        data = SessionInfo.loadSessionList();
+
+        rv.setAdapter(new RecyclerView.Adapter() {
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                final View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item, null);
+                item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = (int) v.getTag();
+                        if (data.get(position).isGroup()) {
+                            startChatActivity(true, data.get(position).getGroup());
+                        } else {
+                            startChatActivity(false, data.get(position).getUser());
+                        }
+                    }
+                });
+                return new MyHolder(item);
+            }
+
+            @Override
+            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+                MyHolder h = (MyHolder) holder;
+                h.ivAvatar.setImageBitmap(data.get(position).getAvatarBitmap(getResources()));
+                h.tvTitle.setText(data.get(position).getTitle());
+                h.tvDate.setText(data.get(position).getDate());
+                h.tvMsg.setText(data.get(position).getMsg());
+                h.item.setTag(position);
+            }
+
+            @Override
+            public int getItemCount() {
+                return data.size();
+            }
+
+            class MyHolder extends RecyclerView.ViewHolder {
+                View item;
+                ImageView ivAvatar;
+                TextView tvTitle;
+                TextView tvDate;
+                TextView tvMsg;
+
+                public MyHolder(View root) {
+                    super(root);
+                    this.item = root;
+                    this.ivAvatar = (ImageView) root.findViewById(R.id.si_iv_avatar);
+                    this.tvTitle = (TextView) root.findViewById(R.id.si_tv_title);
+                    this.tvDate = (TextView) root.findViewById(R.id.si_tv_date);
+                    this.tvMsg = (TextView) root.findViewById(R.id.si_tv_msg);
+                }
+            }
+        });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.i("INFO", "onCreateView:" + currentPageNum);
+        Log.e(Common.LOG_TAG, "onCreateView:" + currentPageNum);
 
         View rootView = null;
         RecyclerView rv = null;
 
         switch (currentPageNum) {
             case 0:
-                rootView = inflater.inflate(R.layout.fragment_contacts, container, false);
-                initContactsView(rootView);
-                rootViews[0] = rootView;
-                return rootView;
-            case 1:
-                rootView = inflater.inflate(R.layout.fragment_session, container, false);
-                rv = (RecyclerView) rootView.findViewById(R.id.fg_rv_session);
-                rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-                rv.setItemAnimator(new DefaultItemAnimator());
-
-
-                final ArrayList<Session> data = new ArrayList<Session>();
-                /*
-                for (int i = 0; i < 100; i++) {
-                    switch (i % 2) {
-                        case 0:
-                            data.add(new Session(resourceIdToPath(this.getActivity(), R.mipmap.test_da), "测试标题" + i + "艺术大师疯狂拉升地方" + i, "09月22日", "测试消息" + i + "花木成畦手自栽客户打扫房间林城" + i));
-                            break;
-                        default:
-                            data.add(new Session(resourceIdToPath(this.getActivity(), R.mipmap.test_xiao), "测试标题" + i + "阿斯利康的飞机疯狂拉升地方" + i, "09月22日", "测试消息" + i + "花木成畦手自栽客户打扫房间林城" + i));
-                            break;
-                    }
+                if (rootViews[0] == null) {
+                    rootView = inflater.inflate(R.layout.fragment_contacts, container, false);
+                    initContactsView(rootView);
+                    initContactsData(rootView);
+                    rootViews[0] = rootView;
                 }
-                */
-                rv.setAdapter(new RecyclerView.Adapter() {
-                    @Override
-                    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                        final View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.session_item, null);
-                        return new MyHolder(item);
-                    }
+                return rootViews[0];
+            case 1:
+                if (rootViews[1] == null) {
+                    rootView = inflater.inflate(R.layout.fragment_session, container, false);
+                    initSessionView(rootView);
+                    initSessionData(rootView);
+                    rootViews[1] = rootView;
+                }
+                return rootViews[1];
 
-                    @Override
-                    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-                        MyHolder h = (MyHolder) holder;
-                        h.ivAvater.setImageURI(Uri.parse(data.get(position).getAvatar()));
-                        h.tvTitle.setText(data.get(position).getTitle());
-                        h.tvDate.setText(data.get(position).getDate());
-                        h.tvMsg.setText(data.get(position).getMsg());
-
-                    }
-
-                    @Override
-                    public int getItemCount() {
-                        return data.size();
-                    }
-
-                    class MyHolder extends RecyclerView.ViewHolder {
-                        ImageView ivAvater;
-                        TextView tvTitle;
-                        TextView tvDate;
-                        TextView tvMsg;
-
-                        public MyHolder(View root) {
-                            super(root);
-                            ivAvater = (ImageView) root.findViewById(R.id.si_iv_avatar);
-                            tvTitle = (TextView) root.findViewById(R.id.si_tv_title);
-                            tvDate = (TextView) root.findViewById(R.id.si_tv_date);
-                            tvMsg = (TextView) root.findViewById(R.id.si_tv_msg);
-                        }
-                    }
-                });
-                return rootView;
             case 2:
                 rootView = inflater.inflate(R.layout.fragment_candy, container, false);
                 TextView textView = (TextView) rootView.findViewById(R.id.section_label);
@@ -228,16 +248,16 @@ public class MainFragment extends Fragment {
         TextView tvUserID = (TextView) rootView.findViewById(R.id.fc_tv_user_id);
         ImageView ivUserAvatar = (ImageView) rootView.findViewById(R.id.fc_iv_user_avatar);
 
-        user = Base.db.loadUserInfo();
+        account = Base.db.loadAccount();
 
-        if (TextUtils.isEmpty(user.getName())) {
+        if (TextUtils.isEmpty(account.getName())) {
             tvUserName.setText("未登录，点我登录吧");
             return rootView;
         }
 
-        tvUserName.setText(user.getName());
-        tvUserID.setText("ID:" + user.getID());
-        byte[] avatar = user.getAvatar();
+        tvUserName.setText(account.getName());
+        tvUserID.setText("ID:" + account.getID());
+        byte[] avatar = account.getAvatar();
         Bitmap bitmap;
         if (avatar != null) {
             bitmap = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
@@ -247,7 +267,6 @@ public class MainFragment extends Fragment {
         ivUserAvatar.setImageBitmap(bitmap);
 
         return rootView;
-
     }
 
     @Override

@@ -61,10 +61,10 @@ public class RegisterActivity extends AppCompatActivity {
                 try {
                     ServiceResponse sr = Base.getService().register(user, password);
                     if (sr.hasError()) {
-                        Snackbar.make(view, Errors.ParseError(getApplicationContext(),sr.getError()), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(view, Errors.ParseError(getApplicationContext(), sr.getError()), Snackbar.LENGTH_LONG).show();
                         return;
                     }
-                    Base.db.saveUserPassword(sr.getId(), user, password);
+                    Base.updateAccount(sr.getId(), user, password);
                     backToMainActivity();
                 } catch (Exception e) {
                     Snackbar.make(view, e.getMessage(), Snackbar.LENGTH_LONG).show();

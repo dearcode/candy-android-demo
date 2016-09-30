@@ -5,6 +5,8 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  *  * Created by c-wind on 2016/9/19 14:31
  *  * mail：root@codecn.org
@@ -79,5 +81,20 @@ public class ServiceResponse implements Parcelable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+
+    public User getUser() {
+        if (data == null || TextUtils.isEmpty(data)) {
+            return null;
+        }
+        return JSON.parseObject(data, User.class);
+    }
+
+    public UserList getUserList() {
+        if (data == null || TextUtils.isEmpty(data)) {
+            return null;
+        }
+        return JSON.parseObject(data, UserList.class);
     }
 }

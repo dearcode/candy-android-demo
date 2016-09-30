@@ -20,11 +20,10 @@ public class CandyActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
 
-    private User user;
-
     public static final int FromLogin = 1;
     public static final int FromRegister = 2;
     public static final int FromMain = 3;
+    public static final int FromChat = 3;
 
 
     @Override
@@ -38,8 +37,6 @@ public class CandyActivity extends AppCompatActivity {
             b = savedInstanceState;
         }
         onStart(b);
-
-        user = Base.db.loadUserInfo();
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -60,10 +57,7 @@ public class CandyActivity extends AppCompatActivity {
                     startActivity(i);
                     return;
                 }
-                user.setName(b.getString("user"));
-                user.setPassword(b.getString("pass"));
-                user.setID(b.getLong("id"));
-                Base.db.saveUserPassword(user.getID(), user.getName(), user.getPassword());
+                Base.updateAccount(b.getLong("id"), b.getString("user"), b.getString("password"));
                 break;
             case FromRegister:
                 if (b.getBoolean("Redirect") && b.getString("RedirectTo").equals("Login")) {

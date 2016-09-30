@@ -8,6 +8,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import net.dearcode.candy.CandyMessage;
+import net.dearcode.candy.model.Message;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.util.Common;
 
@@ -26,7 +27,7 @@ public class MessageService extends Service {
     private class MessageClient implements MessageHandler {
         @Override
         public void onHealth() {
-            Log.e(Common.LOG_TAG, "onHealth");
+
         }
 
         @Override
@@ -45,13 +46,9 @@ public class MessageService extends Service {
         public void onRecv(long id, long method, long group, long from, long to, String msg) {
             Log.e(Common.LOG_TAG, "onRecv");
             Intent i = new Intent("net.dearcode.candy.message");
+            Message m = new Message(id, method, group, from, to, msg);
             Bundle b = new Bundle();
-            b.putLong("id", id);
-            b.putLong("method", method);
-            b.putLong("group", group);
-            b.putLong("from", from);
-            b.putLong("to", to);
-            b.putString("msg", msg);
+            b.putParcelable("message", m);
             i.putExtras(b);
             sendBroadcast(i);
         }
@@ -59,17 +56,32 @@ public class MessageService extends Service {
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {
         @Override
+        public ServiceResponse sendMessage(long group, long to, String msg) throws RemoteException {
+            Log.e(Common.LOG_TAG, "will send message group:" + group + " to:" + to + " msg:" + msg);
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                long id = client.sendMessage(group, to, msg);
+                sr.setId(id);
+                Log.e(Common.LOG_TAG, "connect ok");
+            } catch (Exception e) {
+                Log.e(Common.LOG_TAG, "connect error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
+        }
+
+        @Override
         public ServiceResponse connect() throws RemoteException {
-                Log.e(Common.LOG_TAG, "will connect server");
-                ServiceResponse sr = new ServiceResponse();
-                try {
-                    client.start();
-                    Log.e(Common.LOG_TAG, "connect ok");
-                } catch (Exception e) {
-                    Log.e(Common.LOG_TAG, "connect error:" + e.getMessage());
-                    sr.setError(e.getMessage());
-                }
-                return sr;
+            Log.e(Common.LOG_TAG, "will connect server");
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                client.start();
+                Log.e(Common.LOG_TAG, "connect ok");
+            } catch (Exception e) {
+                Log.e(Common.LOG_TAG, "connect error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
         }
 
         @Override

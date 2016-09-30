@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         Bundle b = i.getExtras();
         if (b != null && b.getBoolean("Register")) {
             tvUser.setText(b.getString("user"));
-            tvPass.setText(b.getString("pass"));
+            tvPass.setText(b.getString("password"));
             Toast.makeText(this, "密码都帮你输入好了，点登录吧", Toast.LENGTH_SHORT).show();
         }
 
@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     Bundle b = new Bundle();
                     b.putString("user", Common.GetString(tvUser.getText()));
-                    b.putString("pass", Common.GetString(tvPass.getText()));
+                    b.putString("password", Common.GetString(tvPass.getText()));
                     b.putLong("id", sr.getId());
                     b.putInt("from", CandyActivity.FromLogin);
                     backToCandyActivity(b);

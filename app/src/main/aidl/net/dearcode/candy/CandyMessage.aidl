@@ -13,6 +13,8 @@ interface CandyMessage {
 
     ServiceResponse login(String user, String pass);
 
+    ServiceResponse sendMessage(long group, long to, String msg);
+
     ServiceResponse loadFriendList();
 
     ServiceResponse loadUserInfo(long ID);

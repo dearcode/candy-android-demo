@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="left|top"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/session_item_margin">
+
+    <net.dearcode.candy.view.ImageView
+        android:layout_alignParentLeft="true"
+        android:id="@+id/ci_iv_avatar"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginLeft="@dimen/session_avatar_margin"
+        android:src="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:layout_marginRight="@dimen/session_item_margin"
+        android:layout_toRightOf="@id/ci_iv_avatar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chat_remote_bg_selector"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ci_tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="12月12日" />
+
+            <TextView
+                android:id="@+id/ci_tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/ci_tv_date"
+                android:ellipsize="end"
+                android:lines="1"
+                android:text="群名字长度会很好的，要换行吗？还是省略呢？？？" />
+
+        </RelativeLayout>
+
+
+        <TextView
+            android:id="@+id/ci_tv_msg"
+            android:layout_width="match_parent"
+            android:textColor="#000"
+            android:layout_height="wrap_content"
+            android:text="Android初级工程师或者校招的面试过程中，很容易被问到LinearLayout与RelativeLayout区别，这是一个基础问题，由此可以引出例如ViewGroup和View绘制流程等问题，可以看出应聘者的掌握程度。" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

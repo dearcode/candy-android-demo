@@ -7,6 +7,7 @@
     <string name="action_settings">登录</string>
     <string name="title_activity_login">登录</string>
     <string name="title_activity_register">注册</string>
+    <string name="title_activity_chat">会话</string>
     <string name="title_activity_search_user">查找用户</string>
     <string name="title_activity_userinfo">用户信息</string>
     <string name="title_session">会话</string>
@@ -30,4 +31,5 @@
     <string name="err_userpasswd_len">用户密码长度错误</string>
     <string name="err_usernick_format">用户昵称格式错误</string>
     <string name="err_usernick_len">用户昵称长度错误</string>
+    <string name="chat_send_message">发送</string>
 </resources>

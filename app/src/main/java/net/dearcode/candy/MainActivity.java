@@ -70,7 +70,6 @@ public class MainActivity extends Activity {
     private static final int StateLoadUser = 3;
     private static final int StateLogin = 4;
     private static final int StateOver = 5;
-    User u;
     int state = StateInit;
     private Runnable runnable = new Runnable() {
 
@@ -111,18 +110,17 @@ public class MainActivity extends Activity {
                     message.obj = "加载用户信息...";
                     break;
                 case StateLoadUser:
-                    u = Base.db.loadUserInfo();
-                    if (u == null) {
+                    if (Base.account == null) {
                         message.obj = "未发现用户，自己登录吧";
                         message.what = 2;
                         state = StateOver;
                         break;
                     }
-                    message.obj = "用户：" + u.getName() + " 正在登录";
+                    message.obj = "用户：" + Base.account.getName() + " 正在登录";
                     state = StateLogin;
                 case StateLogin:
                     try {
-                        ServiceResponse sr = Base.getService().login(u.getName(), u.getPassword());
+                        ServiceResponse sr = Base.getService().login(Base.account.getName(), Base.account.getPassword());
                         if (sr.hasError()) {
                             message.obj = Errors.ParseError(getApplicationContext(),sr.getError());
                             message.what = 2;
