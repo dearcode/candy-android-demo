@@ -9,6 +9,7 @@ import net.dearcode.candy.CandyActivity;
 import net.dearcode.candy.model.FriendList;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.model.User;
+import net.dearcode.candy.util.Common;
 
 import java.util.ArrayList;
 
@@ -18,28 +19,35 @@ import java.util.ArrayList;
  *  
  */
 public class Contacts {
-    private static final String TAG = "Candy";
     public static ArrayList<User> getContacts() {
         ArrayList<User> users = new ArrayList<>();
-        try {
-            ServiceResponse sr = Base.getService().loadFriendList();
-            if (sr.hasError()) {
-                Log.e(TAG, "loadFriendList error:"+sr.getError());
-                return users;
+        ServiceResponse sr = new RPC() {
+            public ServiceResponse getResponse() throws Exception {
+                return Base.getService().loadFriendList();
             }
-            FriendList friendList = JSON.parseObject(sr.getData(), FriendList.class);
-            for (long id: friendList.Users) {
-                sr = Base.getService().loadUserInfo(id);
-                if (sr.hasError()) {
-                    Log.e(TAG, "loadUserInfo error:"+sr.getError());
-                    return users;
-                }
-                User u = JSON.parseObject(sr.getData(), User.class);
-                users.add(u);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "getContacts error:"+ e.getMessage());
+        }.Call();
+        if (sr.hasError()) {
+            Log.e(Common.LOG_TAG, "rpc load friend list error:" + sr.getError());
+            return null;
         }
+        FriendList list = sr.getFriendList();
+        if (list == null || list.Users == null || list.Users.length == 0) {
+            return users;
+        }
+        for (final long id : list.Users) {
+            sr = new RPC() {
+                public ServiceResponse getResponse() throws Exception {
+                    return Base.getService().loadUserInfo(id);
+                }
+            }.Call();
+            if (sr.hasError()) {
+                Log.e(Common.LOG_TAG, "rpc load userInfo error:" + sr.getError());
+                return null;
+            }
+            users.add(sr.getUser());
+            Base.db.saveFriend(id);
+        }
+
         return users;
     }
 

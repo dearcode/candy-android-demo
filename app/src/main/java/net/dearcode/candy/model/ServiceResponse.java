@@ -97,4 +97,11 @@ public class ServiceResponse implements Parcelable {
         }
         return JSON.parseObject(data, UserList.class);
     }
+
+    public FriendList getFriendList() {
+        if (data == null || TextUtils.isEmpty(data)) {
+            return null;
+        }
+        return JSON.parseObject(data, FriendList.class);
+    }
 }

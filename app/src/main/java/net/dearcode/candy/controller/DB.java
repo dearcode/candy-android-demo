@@ -31,8 +31,8 @@ public class DB {
         return false;
     }
 
-    public void addFriend(long id) {
-        db.execSQL("insert into friend (id) values ( " + id + ")");
+    public void saveFriend(long id) {
+        db.execSQL("replace into friend (id) values ( " + id + ")");
     }
 
 
@@ -81,7 +81,7 @@ public class DB {
         db.execSQL("CREATE TABLE IF NOT EXISTS friend(id INTEGER PRIMARY KEY)");
 
         // 系统消息， 类型， 哪个群触发的，哪个用户触发的，具体消息内容，如：群A看用户B修改了群名为msg
-        db.execSQL("CREATE TABLE IF NOT EXISTS system_message(id INTEGER PRIMARY KEY, method integer, `group` integer, `from` integer, msg text)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS system_message(id INTEGER PRIMARY KEY, event integer, relation integer, `group` integer, `from` integer, msg text)");
 
         // 群消息，哪个群，谁发的，是否@了其它人，具体消息
         db.execSQL("CREATE TABLE IF NOT EXISTS group_message(id INTEGER PRIMARY KEY, `group` integer, `from` integer, `to` integer, msg text)");
@@ -118,14 +118,15 @@ public class DB {
 
     public ArrayList<Message> loadSystemMessage() {
         ArrayList<Message> msgs = new ArrayList<>();
-        Cursor c = db.rawQuery("SELECT id, method, `group`, `from`, msg from system_message order by id desc limit 10", null);
+        Cursor c = db.rawQuery("SELECT id, event, relation, `group`, `from`, msg from system_message order by id desc limit 10", null);
         while (c.moveToNext()) {
             Message msg = new Message();
             msg.setId(c.getLong(0));
-            msg.setMethod(c.getLong(1));
-            msg.setGroup(c.getLong(2));
-            msg.setFrom(c.getLong(3));
-            msg.setMsg(c.getString(4));
+            msg.setEvent(c.getInt(1));
+            msg.setRelation(c.getInt(2));
+            msg.setGroup(c.getLong(3));
+            msg.setFrom(c.getLong(4));
+            msg.setMsg(c.getString(5));
             msgs.add(msg);
         }
         c.close();
@@ -149,11 +150,11 @@ public class DB {
     }
 
     public void saveGroupMessage(long id, long group, long from, long to, String msg) {
-        db.execSQL("insert into system_message(id, `group`, `from`, to, msg) values (?,?, ?, ?,?)", new Object[]{id, group, from, to, msg});
+        db.execSQL("insert into group_message(id, `group`, `from`, to, msg) values (?,?, ?, ?,?)", new Object[]{id, group, from, to, msg});
     }
 
-    public void saveSystemMessage(long id, long method, long group, long from, String msg) {
-        db.execSQL("insert into system_message(id, method, `group`, `from`, msg) values (?,?, ?, ?,?)", new Object[]{id, method, group, from, msg});
+    public void saveSystemMessage(long id, int event, int relation, long group, long from, String msg) {
+        db.execSQL("insert into system_message(id, event, relation, `group`, `from`, msg) values (?,?, ?, ?, ?,?)", new Object[]{id, event, relation, group, from, msg});
     }
 
     public ArrayList<Message> loadUserMessage(long id) {

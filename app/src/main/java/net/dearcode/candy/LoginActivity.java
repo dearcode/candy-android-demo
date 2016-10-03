@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                     Bundle b = new Bundle();
                     b.putString("user", Common.GetString(tvUser.getText()));
                     b.putString("password", Common.GetString(tvPass.getText()));
-                    b.putLong("id", sr.getId());
+                    b.putLong("uid", sr.getId());
                     b.putInt("from", CandyActivity.FromLogin);
                     backToCandyActivity(b);
                 } catch (RemoteException e) {

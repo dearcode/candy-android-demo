@@ -158,7 +158,7 @@ public class SearchActivity extends AppCompatActivity {
                 Bundle b = new Bundle();
                 b.putString("name", u.getName());
                 b.putString("nickname", u.getNickName());
-                b.putLong("id", u.getID());
+                b.putLong("uid", u.getID());
                 b.putByteArray("nickname", u.getAvatar());
                 b.putString("From", "Search");
                 i.putExtras(b);

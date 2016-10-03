@@ -43,11 +43,27 @@
 
     <TextView
         android:id="@+id/au_tv_userid"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal|center_vertical"
         android:ellipsize="end"
         android:lines="1"
         android:text="111111111111" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="@dimen/session_item_margin"
+        android:background="#ddd" />
+
+    <TextView
+        android:id="@+id/au_tv_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|center_vertical"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text="添加我为好友吧，谢谢了" />
 
     <View
         android:layout_width="fill_parent"
@@ -66,6 +82,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="通过" />
+        <Button
+            android:id="@+id/au_btn_open_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="聊天" />
 
         <Button
             android:id="@+id/au_btn_refuse"

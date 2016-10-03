@@ -23,6 +23,10 @@ interface CandyMessage {
 
     ServiceResponse addFriend(long ID, String msg);
 
+    ServiceResponse ConfirmFriend(long ID);
+
+    ServiceResponse RefuseFriend(long ID, String msg);
+
     /**
      * Demonstrates some basic types that you can use as parameters
      * and return values in AIDL.

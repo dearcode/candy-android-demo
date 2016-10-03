@@ -8,7 +8,9 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import net.dearcode.candy.CandyMessage;
+import net.dearcode.candy.model.Event;
 import net.dearcode.candy.model.Message;
+import net.dearcode.candy.model.Relation;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.util.Common;
 
@@ -25,6 +27,7 @@ public class MessageService extends Service {
     private MessageClient msgClient;
 
     private class MessageClient implements MessageHandler {
+
         @Override
         public void onHealth() {
 
@@ -43,10 +46,10 @@ public class MessageService extends Service {
         }
 
         @Override
-        public void onRecv(long id, long method, long group, long from, long to, String msg) {
+        public void onRecv(int event, int relation, long id, long group, long from, long to, String msg) {
             Log.e(Common.LOG_TAG, "onRecv");
             Intent i = new Intent("net.dearcode.candy.message");
-            Message m = new Message(id, method, group, from, to, msg);
+            Message m = new Message(Event.values()[event], Relation.values()[relation] , id, group, from, to, msg);
             Bundle b = new Bundle();
             b.putParcelable("message", m);
             i.putExtras(b);
@@ -55,6 +58,34 @@ public class MessageService extends Service {
     }
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {
+        @Override
+        public ServiceResponse ConfirmFriend(long ID) throws RemoteException {
+            Log.e(Common.LOG_TAG, "begin confirm friend:" + ID );
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                client.friend(ID, Relation.CONFIRM.ordinal(), "");
+                Log.e(Common.LOG_TAG, "confirm friend success");
+            } catch (Exception e) {
+                Log.e(Common.LOG_TAG, "confirm friend error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
+        }
+
+        @Override
+        public ServiceResponse RefuseFriend(long ID, String msg) throws RemoteException {
+            Log.e(Common.LOG_TAG, "begin refuse friend:" + ID );
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                client.friend(ID, Relation.CONFIRM.ordinal(), "");
+                Log.e(Common.LOG_TAG, "refuse friend success");
+            } catch (Exception e) {
+                Log.e(Common.LOG_TAG, "refuse friend error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
+        }
+
         @Override
         public ServiceResponse sendMessage(long group, long to, String msg) throws RemoteException {
             Log.e(Common.LOG_TAG, "will send message group:" + group + " to:" + to + " msg:" + msg);
@@ -89,9 +120,8 @@ public class MessageService extends Service {
             Log.e(Common.LOG_TAG, "will add friend user:" + ID);
             ServiceResponse sr = new ServiceResponse();
             try {
-                boolean ok = client.addFriend(ID, false, msg);
-                Log.e(Common.LOG_TAG, "add friend ok , confirm:" + ok);
-                sr.setData("" + ok);
+                client.friend(ID, Relation.ADD.ordinal(), msg);
+                Log.e(Common.LOG_TAG, "add friend success");
             } catch (Exception e) {
                 Log.e(Common.LOG_TAG, "add friend error:" + e.getMessage());
                 sr.setError(e.getMessage());
@@ -198,8 +228,8 @@ public class MessageService extends Service {
         Log.e(Common.LOG_TAG, "service onCreate begin");
         msgClient = new MessageClient();
         try {
-            //client = newCandyClient("candy.dearcode.net:9000", msgClient);
-            client = newCandyClient("192.168.0.103:9000", msgClient);
+            client = newCandyClient("candy.dearcode.net:9000", msgClient);
+            //client = newCandyClient("192.168.0.103:9000", msgClient);
         } catch (Exception e) {
             Log.e(Common.LOG_TAG, "service start candy client error:" + e.getMessage());
         }

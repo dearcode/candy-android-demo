@@ -82,8 +82,8 @@ public class User {
         NickName = nickName;
     }
 
-    public void setBundle(Bundle bundle) {
-        bundle.putLong("id", ID);
+    public void setToBundle(Bundle bundle) {
+        bundle.putLong("uid", ID);
         bundle.putByteArray("avatar", Avatar);
         bundle.putString("name", Name);
         bundle.putString("nickname", NickName);

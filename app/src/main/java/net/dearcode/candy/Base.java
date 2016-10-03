@@ -22,6 +22,8 @@ import net.dearcode.candy.util.Common;
 public class Base extends Application {
     public static DB db;
     public static User account;
+    public static long friendLastModify;
+    public static long sessionLastModify;
     private static ServiceBinder binder;
 
     public static void updateAccount(long id, String name, String password) {
@@ -37,6 +39,14 @@ public class Base extends Application {
         account = db.loadAccount();
         Log.e(Common.LOG_TAG, "onCreate bind");
 
+    }
+
+    public static void touchFriendList() {
+        friendLastModify = System.currentTimeMillis();
+    }
+
+    public static void touchSessionList() {
+        sessionLastModify = System.currentTimeMillis();
     }
 
     @Override

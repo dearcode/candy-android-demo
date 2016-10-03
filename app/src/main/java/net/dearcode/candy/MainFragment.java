@@ -34,56 +34,78 @@ import java.util.ArrayList;
  *  
  */
 public class MainFragment extends Fragment {
-
     public static final String ARG_PAGE = "page_num";
     private User account;
-
-    // 当前页
     private int currentPageNum;
+    private View[] rootViews = new View[3];
+
+    private long friendLastModify;
+    private long sessionLastModify;
+
+    RecyclerView rvContacts;
+
+    ArrayList<Session> sessions  = new ArrayList<>();
+    ArrayList<User> users =  new ArrayList<>();
 
     public MainFragment() {
     }
 
     public static MainFragment create(int pagerNum) {
-
         MainFragment myPageFrament = new MainFragment();
         Bundle arg = new Bundle();
         arg.putInt(ARG_PAGE, pagerNum);
         myPageFrament.setArguments(arg);
-
         return myPageFrament;
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         currentPageNum = getArguments().getInt(ARG_PAGE);
+        users = Contacts.getContacts();
+        sessions = SessionInfo.loadSessionList();
         Log.i("INFO", "onCreate:" + currentPageNum);
-    }
-
-    public static final String ANDROID_RESOURCE = "android.resource://";
-    public static final String FORWARD_SLASH = "/";
-
-    private static String resourceIdToPath(Context context, int resourceId) {
-        return ANDROID_RESOURCE + context.getPackageName() + FORWARD_SLASH + resourceId;
     }
 
     private void startChatActivity(boolean isGroup, long id) {
         Intent i = new Intent(getActivity(), ChatActivity.class);
         Bundle b = new Bundle();
         b.putBoolean("isGroup", isGroup);
-        b.putLong("id", id);
+        if (isGroup) b.putLong("gid", id);
+        else b.putLong("uid", id);
+
         i.putExtras(b);
         startActivity(i);
         getActivity().finish();
 
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (friendLastModify != Base.friendLastModify) {
+            //reload friend list
+            users = Contacts.getContacts();
+            friendLastModify = Base.friendLastModify;
+            rvContacts.getAdapter().notifyDataSetChanged();
+        }
+
+        if (sessionLastModify != Base.sessionLastModify) {
+            //reload session list
+            sessions = SessionInfo.loadSessionList();
+            sessionLastModify = Base.sessionLastModify;
+            rvSession.getAdapter().notifyDataSetChanged();
+        }
+
+    }
+
+    RecyclerView rvSession;
+
     private void initContactsData(final View root) {
-        RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
-        rv.setAdapter(new RecyclerView.Adapter() {
-            ArrayList<User> users = Contacts.getContacts();
+        rvSession = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
+        rvSession.setAdapter(new RecyclerView.Adapter() {
 
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -127,10 +149,8 @@ public class MainFragment extends Fragment {
 
     }
 
-    private View[] rootViews = new View[3];
-
     private void initContactsView(View root) {
-        RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
+        rvContacts = (RecyclerView) root.findViewById(R.id.fg_rv_contacts);
         RecyclerViewHeader header = (RecyclerViewHeader) root.findViewById(R.id.fg_rv_contacts_header);
         RelativeLayout rlSearch = (RelativeLayout) header.findViewById(R.id.fc_rl_search);
         rlSearch.setOnClickListener(new View.OnClickListener() {
@@ -141,9 +161,9 @@ public class MainFragment extends Fragment {
             }
         });
 
-        rv.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        rv.setItemAnimator(new DefaultItemAnimator());
-        header.attachTo(rv);
+        rvContacts.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        rvContacts.setItemAnimator(new DefaultItemAnimator());
+        header.attachTo(rvContacts);
     }
 
     private void initSessionView(View root) {
@@ -152,12 +172,8 @@ public class MainFragment extends Fragment {
         rv.setItemAnimator(new DefaultItemAnimator());
     }
 
-
-    ArrayList<Session> data;
-
     private void initSessionData(final View root) {
         RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_session);
-        data = SessionInfo.loadSessionList();
 
         rv.setAdapter(new RecyclerView.Adapter() {
             @Override
@@ -167,10 +183,10 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         int position = (int) v.getTag();
-                        if (data.get(position).isGroup()) {
-                            startChatActivity(true, data.get(position).getGroup());
+                        if (sessions.get(position).isGroup()) {
+                            startChatActivity(true, sessions.get(position).getGroup());
                         } else {
-                            startChatActivity(false, data.get(position).getUser());
+                            startChatActivity(false, sessions.get(position).getUser());
                         }
                     }
                 });
@@ -180,16 +196,17 @@ public class MainFragment extends Fragment {
             @Override
             public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
                 MyHolder h = (MyHolder) holder;
-                h.ivAvatar.setImageBitmap(data.get(position).getAvatarBitmap(getResources()));
-                h.tvTitle.setText(data.get(position).getTitle());
-                h.tvDate.setText(data.get(position).getDate());
-                h.tvMsg.setText(data.get(position).getMsg());
+                Session session = sessions.get(position);
+                h.ivAvatar.setImageBitmap(session.getAvatarBitmap(getResources()));
+                h.tvTitle.setText(session.getTitle());
+                h.tvDate.setText(session.getDate());
+                h.tvMsg.setText(session.getMsg());
                 h.item.setTag(position);
             }
 
             @Override
             public int getItemCount() {
-                return data.size();
+                return sessions.size();
             }
 
             class MyHolder extends RecyclerView.ViewHolder {
@@ -216,7 +233,6 @@ public class MainFragment extends Fragment {
         Log.e(Common.LOG_TAG, "onCreateView:" + currentPageNum);
 
         View rootView = null;
-        RecyclerView rv = null;
 
         switch (currentPageNum) {
             case 0:

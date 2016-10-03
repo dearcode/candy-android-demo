@@ -24,6 +24,7 @@ public class CandyActivity extends AppCompatActivity {
     public static final int FromRegister = 2;
     public static final int FromMain = 3;
     public static final int FromChat = 3;
+    public static final int FromUserinfo = 4;
 
 
     @Override
@@ -57,7 +58,7 @@ public class CandyActivity extends AppCompatActivity {
                     startActivity(i);
                     return;
                 }
-                Base.updateAccount(b.getLong("id"), b.getString("user"), b.getString("password"));
+                Base.updateAccount(b.getLong("uid"), b.getString("user"), b.getString("password"));
                 break;
             case FromRegister:
                 if (b.getBoolean("Redirect") && b.getString("RedirectTo").equals("Login")) {

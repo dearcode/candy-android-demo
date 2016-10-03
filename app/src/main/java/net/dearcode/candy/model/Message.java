@@ -10,13 +10,45 @@ import android.os.Parcelable;
  *  
  */
 public class Message implements Parcelable {
+    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>() {
+        public Message createFromParcel(Parcel in) {
+            return new Message(in);
+        }
+
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
+    private Event event;
+    private Relation relation;
     private long id;
-    private long method;
     private long group;
     private long from;
     private long to;
     private String msg;
 
+    public Message(Event event, Relation relation, long id, long group, long from, long to, String msg) {
+        this.event = event;
+        this.relation = relation;
+        this.id = id;
+        this.group = group;
+        this.from = from;
+        this.to = to;
+        this.msg = msg;
+    }
+
+    public Message() {
+    }
+
+    protected Message(Parcel in) {
+        this.event = Event.values()[in.readInt()];
+        this.relation = Relation.values()[in.readInt()];
+        this.id = in.readLong();
+        this.group = in.readLong();
+        this.from = in.readLong();
+        this.to = in.readLong();
+        this.msg = in.readString();
+    }
 
     public long getId() {
         return id;
@@ -24,14 +56,6 @@ public class Message implements Parcelable {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getMethod() {
-        return method;
-    }
-
-    public void setMethod(long method) {
-        this.method = method;
     }
 
     public long getGroup() {
@@ -66,7 +90,6 @@ public class Message implements Parcelable {
         this.msg = msg;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -74,43 +97,24 @@ public class Message implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        //long id, long method, long group, long from, long to, String msg)
+        // Event event; Relation relation; long id; long group; long from; long to; String msg;
+        dest.writeInt(event.ordinal());
+        dest.writeInt(relation.ordinal());
         dest.writeLong(id);
-        dest.writeLong(method);
         dest.writeLong(group);
         dest.writeLong(from);
         dest.writeLong(to);
         dest.writeString(msg);
     }
 
-    public Message(long id, long method, long group, long from, long to, String msg) {
-        this.id = id;
-        this.method = method;
-        this.group = group;
-        this.from = from;
-        this.to = to;
-        this.msg = msg;
-    }
-
-    public Message() {
-    }
-
-    protected Message(Parcel in) {
-        this.id = in.readLong();
-        this.method = in.readLong();
-        this.group = in.readLong();
-        this.from = in.readLong();
-        this.to = in.readLong();
-        this.msg = in.readString();
-    }
-
     public boolean isGroupMessage() {
         return group != 0;
     }
 
-    public void setBundle(Bundle b) {
-        b.putLong("id", id);
-        b.putLong("method", method);
+    public void setToBundle(Bundle b) {
+        b.putInt("event", event.ordinal());
+        b.putInt("relation", relation.ordinal());
+        b.putLong("mid", id);
         b.putLong("group", group);
         b.putLong("from", from);
         b.putLong("to", to);
@@ -121,14 +125,26 @@ public class Message implements Parcelable {
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date((id >> 32) * 1000));
     }
 
-    public static final Parcelable.Creator<Message> CREATOR = new
-            Parcelable.Creator<Message>() {
-                public Message createFromParcel(Parcel in) {
-                    return new Message(in);
-                }
+    public Event getEvent() {
+        return event;
+    }
 
-                public Message[] newArray(int size) {
-                    return new Message[size];
-                }
-            };
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+    public void setEvent(int e) {
+        this.event = Event.values()[e];
+    }
+
+    public Relation getRelation() {
+        return relation;
+    }
+
+    public void setRelation(Relation relation) {
+        this.relation = relation;
+    }
+
+    public void setRelation(int r) {
+        this.relation = Relation.values()[r];
+    }
 }

@@ -17,6 +17,8 @@ import com.alibaba.fastjson.JSON;
 import net.dearcode.candy.Base;
 import net.dearcode.candy.R;
 import net.dearcode.candy.UserInfoActivity;
+import net.dearcode.candy.controller.RPC;
+import net.dearcode.candy.model.Event;
 import net.dearcode.candy.model.Message;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.model.User;
@@ -43,44 +45,45 @@ public class MessageReceiver extends BroadcastReceiver {
             return;
         }
 
-        //消息自己显示去
-        if (m.getMethod() ==0) {
+        if (m.getEvent() == Event.None) {
+            if (m.isGroupMessage()) {
+                Base.db.saveUserMessage(m.getId(), m.getGroup(), m.getFrom(), m.getMsg());
+                Base.db.saveSession(m.getGroup(), true, m.getMsg());
+            } else {
+                Base.db.saveUserMessage(m.getId(), m.getFrom(), m.getFrom(), m.getMsg());
+                Base.db.saveSession(m.getFrom(), false, m.getMsg());
+            }
+            //消息自己显示去
             Intent i = new Intent("net.dearcode.candy.chat");
             i.putExtras(b);
             context.sendBroadcast(i);
-        }else {
-            showAddFriendNotification(context, m);
-
-        }
-    }
-
-
-    private void showAddFriendNotification(Context ctx, Message m) {
-        NotificationManager manger = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx);
-
-        ServiceResponse sr = new ServiceResponse();
-        try {
-            sr = Base.getService().loadUserInfo(m.getFrom());
-        } catch (RemoteException e) {
-            Log.e(Common.LOG_TAG, e.getMessage());
-        }
-
-        if (sr.hasError()) {
-            Log.e(Common.LOG_TAG, "loadUserInfo error:" + sr.getError());
             return;
         }
-        User user = JSON.parseObject(sr.getData(), User.class);
+
+        Base.db.saveSystemMessage(m.getId(), m.getEvent().ordinal(), m.getRelation().ordinal(), m.getGroup(), m.getFrom(), m.getMsg());
+        switch (m.getEvent()) {
+            case Friend:
+                showFriendNotification(context, m);
+                break;
+            case Group:
+                showFriendNotification(context, m);
+                break;
+        }
 
 
+    }
+
+    private void showNotification(Context ctx, Intent intent, String title, String content, String sub ) {
+        NotificationManager manger = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx);
         //Ticker是状态栏显示的提示
         builder.setTicker("Candy");
         //第一行内容  通常作为通知栏标题
-        builder.setContentTitle("添加好友请求");
+        builder.setContentTitle(title);
         //第二行内容 通常是通知正文
-        builder.setContentText("用户：" + user.getName());
+        builder.setContentText(content);
         //第三行内容 通常是内容摘要什么的 在低版本机器上不一定显示
-        builder.setSubText("消息：" + m.getMsg());
+        builder.setSubText(sub);
         //ContentInfo 在通知的右侧 时间的下面 用来展示一些其他信息
         //builder.setContentInfo("2");
         //number设计用来显示同种通知的数量和ContentInfo的位置一样，如果设置了ContentInfo则number会被隐藏
@@ -91,21 +94,36 @@ public class MessageReceiver extends BroadcastReceiver {
         builder.setSmallIcon(R.mipmap.ic_launcher);
         //下拉显示的大图标
         builder.setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.ic_launcher));
-        Intent i = new Intent(ctx, UserInfoActivity.class);
-        Bundle b = new Bundle();
-        user.setBundle(b);
-        m.setBundle(b);
-        b.putString("Action", "AddFriend");
-        i.putExtras(b);
-        PendingIntent pIntent = PendingIntent.getActivity(ctx, 1, i, 0);
+        PendingIntent pIntent = PendingIntent.getActivity(ctx, 1, intent, 0);
         //点击跳转的intent
         builder.setContentIntent(pIntent);
         //通知默认的声音 震动 呼吸灯
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         Notification notification = builder.build();
         manger.notify(0, notification);
+    }
 
 
+    private void showFriendNotification(Context ctx, final Message message) {
+        ServiceResponse sr = new RPC() {
+            @Override
+            public ServiceResponse getResponse() throws Exception {
+                return Base.getService().loadUserInfo(message.getFrom());
+            }
+        }.Call();
+        if (sr.hasError()) {
+            Log.e(Common.LOG_TAG, "loadUserInfo error:" + sr.getError());
+            return;
+        }
+        User user = JSON.parseObject(sr.getData(), User.class);
+
+        Intent intent = new Intent(ctx, UserInfoActivity.class);
+        Bundle bundle = new Bundle();
+        user.setToBundle(bundle);
+        message.setToBundle(bundle);
+        intent.putExtras(bundle);
+
+        showNotification(ctx, intent, "添加好友请求", "用户：" + user.getName(), "消息：" + message.getMsg());
     }
 }
 

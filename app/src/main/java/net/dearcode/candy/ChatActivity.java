@@ -23,7 +23,9 @@ import android.widget.Toast;
 
 import net.dearcode.candy.controller.RPC;
 import net.dearcode.candy.controller.UserInfo;
+import net.dearcode.candy.model.Event;
 import net.dearcode.candy.model.Message;
+import net.dearcode.candy.model.Relation;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.model.User;
 import net.dearcode.candy.util.Common;
@@ -47,6 +49,7 @@ public class ChatActivity extends AppCompatActivity {
     private boolean inGroup;
 
     private ArrayList<Message> msgs;
+    private MyBroadcastReceiver myBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,14 +75,13 @@ public class ChatActivity extends AppCompatActivity {
     private void initChatMessage(Bundle b) {
         inGroup = b.getBoolean("isGroup");
         if (inGroup) {
-            group = b.getLong("id");
+            group = b.getLong("gid");
             msgs = Base.db.loadGroupMessage(group);
         } else {
-            user = b.getLong("id");
+            user = b.getLong("uid");
             msgs = Base.db.loadUserMessage(user);
         }
     }
-
 
     private void initChatView() {
         rvTalk = (RecyclerView) findViewById(R.id.ac_rv_talk);
@@ -118,7 +120,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 Log.e(Common.LOG_TAG, "new Message id:" + sr.getId() + " group:" + group + " user:" + user + " msg:" + msg);
                 etMessage.setText("");
-                msgs.add(new Message(sr.getId(), 0, group, Base.account.getID(), user, msg));
+                msgs.add(new Message(Event.None, Relation.DEL, sr.getId(), group, Base.account.getID(), user, msg));
                 rvTalk.getAdapter().notifyDataSetChanged();
                 rvTalk.smoothScrollToPosition(msgs.size() - 1);
             }
@@ -151,9 +153,8 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public int getItemViewType(int position) {
-                Log.e(Common.LOG_TAG, "from:" + msgs.get(position).getFrom() + " id:" + Base.account.getID());
-                if (msgs.get(position).getFrom() == Base.account.getID())
-                    return 1;
+                Log.e(Common.LOG_TAG, "local message:" + (msgs.get(position).getFrom() == Base.account.getID()));
+                if (msgs.get(position).getFrom() == Base.account.getID()) return 1;
                 return 0;
             }
 
@@ -181,8 +182,7 @@ public class ChatActivity extends AppCompatActivity {
         rvTalk.setLayoutManager(new LinearLayoutManager(this));
         rvTalk.setItemAnimator(new DefaultItemAnimator());
 
-        if (msgs.size() > 0)
-            rvTalk.smoothScrollToPosition(msgs.size() - 1);
+        if (msgs.size() > 0) rvTalk.smoothScrollToPosition(msgs.size() - 1);
 
     }
 
@@ -199,8 +199,6 @@ public class ChatActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private MyBroadcastReceiver myBroadcastReceiver;
-
     private class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -215,13 +213,6 @@ public class ChatActivity extends AppCompatActivity {
                 return;
             }
 
-            if (m.isGroupMessage()) {
-                Base.db.saveUserMessage(m.getId(), m.getGroup(), m.getFrom(), m.getMsg());
-                Base.db.saveSession(m.getGroup(), true, m.getMsg());
-            } else {
-                Base.db.saveUserMessage(m.getId(), m.getFrom(), m.getFrom(), m.getMsg());
-                Base.db.saveSession(m.getFrom(), false, m.getMsg());
-            }
 
             if ((m.isGroupMessage() && m.getGroup() == group) || (!m.isGroupMessage() && m.getFrom() == user)) {
                 msgs.add(m);
