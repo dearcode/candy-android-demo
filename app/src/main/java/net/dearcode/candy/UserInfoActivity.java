@@ -138,6 +138,7 @@ public class UserInfoActivity extends AppCompatActivity {
             b = savedInstanceState;
         }
 
+        Log.e(Common.LOG_TAG, "------"+b.toString());
         uid = b.getLong("uid");
 
         byte[] avatar = b.getByteArray("avatar");

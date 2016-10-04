@@ -92,9 +92,10 @@ public class MessageReceiver extends BroadcastReceiver {
         builder.setAutoCancel(true);
         //系统状态栏显示的小图标
         builder.setSmallIcon(R.mipmap.ic_launcher);
+        Log.e(Common.LOG_TAG, "**********"+intent.getExtras().toString());
         //下拉显示的大图标
         builder.setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.ic_launcher));
-        PendingIntent pIntent = PendingIntent.getActivity(ctx, 1, intent, 0);
+        PendingIntent pIntent = PendingIntent.getActivity(ctx, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         //点击跳转的intent
         builder.setContentIntent(pIntent);
         //通知默认的声音 震动 呼吸灯

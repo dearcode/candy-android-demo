@@ -85,14 +85,14 @@ public class MainFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (friendLastModify != Base.friendLastModify) {
+        if (friendLastModify != Base.friendLastModify && rvContacts != null) {
             //reload friend list
             users = Contacts.getContacts();
             friendLastModify = Base.friendLastModify;
             rvContacts.getAdapter().notifyDataSetChanged();
         }
 
-        if (sessionLastModify != Base.sessionLastModify) {
+        if (sessionLastModify != Base.sessionLastModify && rvSession != null) {
             //reload session list
             sessions = SessionInfo.loadSessionList();
             sessionLastModify = Base.sessionLastModify;

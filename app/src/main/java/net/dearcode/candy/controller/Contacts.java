@@ -28,7 +28,7 @@ public class Contacts {
         }.Call();
         if (sr.hasError()) {
             Log.e(Common.LOG_TAG, "rpc load friend list error:" + sr.getError());
-            return null;
+            return users;
         }
         FriendList list = sr.getFriendList();
         if (list == null || list.Users == null || list.Users.length == 0) {
@@ -42,7 +42,7 @@ public class Contacts {
             }.Call();
             if (sr.hasError()) {
                 Log.e(Common.LOG_TAG, "rpc load userInfo error:" + sr.getError());
-                return null;
+                return users;
             }
             users.add(sr.getUser());
             Base.db.saveFriend(id);
