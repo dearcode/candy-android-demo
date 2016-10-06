@@ -59,6 +59,20 @@ public class MessageService extends Service {
 
     private CandyMessage.Stub serviceBinder = new CandyMessage.Stub() {
         @Override
+        public ServiceResponse logout() throws RemoteException {
+            Log.e(Common.LOG_TAG, "begin logout");
+            ServiceResponse sr = new ServiceResponse();
+            try {
+                client.logout();
+                Log.e(Common.LOG_TAG, "logout success");
+            } catch (Exception e) {
+                Log.e(Common.LOG_TAG, "logout error:" + e.getMessage());
+                sr.setError(e.getMessage());
+            }
+            return sr;
+        }
+
+        @Override
         public ServiceResponse ConfirmFriend(long ID) throws RemoteException {
             Log.e(Common.LOG_TAG, "begin confirm friend:" + ID );
             ServiceResponse sr = new ServiceResponse();

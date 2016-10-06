@@ -124,7 +124,17 @@ public class MessageReceiver extends BroadcastReceiver {
         message.setToBundle(bundle);
         intent.putExtras(bundle);
 
-        showNotification(ctx, intent, "添加好友请求", "用户：" + user.getName(), "消息：" + message.getMsg());
+        switch (message.getRelation()) {
+            case ADD:
+                showNotification(ctx, intent, "添加好友请求", "用户：" + user.getNickName(), "消息：" + message.getMsg());
+            case CONFIRM:
+                showNotification(ctx, intent, "添加好友成功", "用户：" + user.getNickName(), "");
+            case REFUSE:
+                showNotification(ctx, intent, "添加好友失败", "用户：" + user.getNickName(), "");
+
+        }
+
+        //showNotification(ctx, intent, "添加好友请求", "用户：" + user.getName(), "消息：" + message.getMsg());
     }
 }
 

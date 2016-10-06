@@ -70,6 +70,10 @@ public class DB {
         return user;
     }
 
+    public void delAccount() {
+        db.execSQL("delete from account");
+    }
+
     public void saveAccount(long id, String user, String password) {
         db.execSQL("replace into account(id, user, password) values (?,?,?)", new Object[]{id, user, password});
     }

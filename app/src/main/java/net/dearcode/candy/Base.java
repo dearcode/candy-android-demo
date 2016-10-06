@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import net.dearcode.candy.controller.DB;
+import net.dearcode.candy.controller.RPC;
 import net.dearcode.candy.controller.ServiceBinder;
 import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.model.User;
@@ -28,6 +29,11 @@ public class Base extends Application {
 
     public static void updateAccount(long id, String name, String password) {
         db.saveAccount(id, name, password);
+        account = db.loadAccount();
+    }
+
+    public static void delAccount() {
+        db.delAccount();
         account = db.loadAccount();
     }
 
@@ -55,6 +61,7 @@ public class Base extends Application {
         super.onTerminate();
         binder.Disconnect();
     }
+
 
     public static CandyMessage getService() {
         return binder.getCandy();

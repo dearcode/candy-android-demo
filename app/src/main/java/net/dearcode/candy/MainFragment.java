@@ -14,13 +14,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
 
 import net.dearcode.candy.controller.Contacts;
+import net.dearcode.candy.controller.RPC;
 import net.dearcode.candy.controller.SessionInfo;
+import net.dearcode.candy.model.ServiceResponse;
 import net.dearcode.candy.model.Session;
 import net.dearcode.candy.model.User;
 import net.dearcode.candy.util.Common;
@@ -172,6 +175,54 @@ public class MainFragment extends Fragment {
         rv.setItemAnimator(new DefaultItemAnimator());
     }
 
+    private void initControlView(View root) {
+        account = Base.db.loadAccount();
+
+        TextView tvUserName = (TextView) root.findViewById(R.id.fc_tv_user_name);
+        TextView tvUserID = (TextView) root.findViewById(R.id.fc_tv_user_id);
+        ImageView ivUserAvatar = (ImageView) root.findViewById(R.id.fc_iv_user_avatar);
+        Button btnExit = (Button) root.findViewById(R.id.fc_btn_exit);
+
+        if (TextUtils.isEmpty(account.getName())) {
+            tvUserName.setText("未登录，点我登录吧");
+            return ;
+        }
+
+        tvUserName.setText(account.getName());
+        tvUserID.setText("ID:" + account.getID());
+        byte[] avatar = account.getAvatar();
+        Bitmap bitmap;
+        if (avatar != null) {
+            bitmap = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
+        } else {
+            bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.test_da);
+        }
+        ivUserAvatar.setImageBitmap(bitmap);
+
+
+
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ServiceResponse sr = new RPC() {
+                    @Override
+                    public ServiceResponse getResponse() throws Exception {
+                        return Base.getService().logout();
+                    }
+                }.Call();
+                if (sr.hasError()) {
+                    Log.e(Common.LOG_TAG, "logout error:" + sr.getError());
+                }
+                Base.delAccount();
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+    }
+
+
     private void initSessionData(final View root) {
         RecyclerView rv = (RecyclerView) root.findViewById(R.id.fg_rv_session);
 
@@ -232,7 +283,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.e(Common.LOG_TAG, "onCreateView:" + currentPageNum);
 
-        View rootView = null;
+        View rootView;
 
         switch (currentPageNum) {
             case 0:
@@ -257,32 +308,12 @@ public class MainFragment extends Fragment {
                 TextView textView = (TextView) rootView.findViewById(R.id.section_label);
                 textView.setText("这里要显示朋友圈");
                 return rootView;
+
+            default:
+                rootView = inflater.inflate(R.layout.fragment_control, container, false);
+                initControlView(rootView);
+                return rootView;
         }
-
-        rootView = inflater.inflate(R.layout.fragment_control, container, false);
-        TextView tvUserName = (TextView) rootView.findViewById(R.id.fc_tv_user_name);
-        TextView tvUserID = (TextView) rootView.findViewById(R.id.fc_tv_user_id);
-        ImageView ivUserAvatar = (ImageView) rootView.findViewById(R.id.fc_iv_user_avatar);
-
-        account = Base.db.loadAccount();
-
-        if (TextUtils.isEmpty(account.getName())) {
-            tvUserName.setText("未登录，点我登录吧");
-            return rootView;
-        }
-
-        tvUserName.setText(account.getName());
-        tvUserID.setText("ID:" + account.getID());
-        byte[] avatar = account.getAvatar();
-        Bitmap bitmap;
-        if (avatar != null) {
-            bitmap = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
-        } else {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.test_da);
-        }
-        ivUserAvatar.setImageBitmap(bitmap);
-
-        return rootView;
     }
 
     @Override
